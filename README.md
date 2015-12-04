@@ -11,10 +11,12 @@ This library was created for, and is used by the C++ IDE project [juCi++](https:
 * Write to stdin
 * Kill a running process (SIGTERM is supported on Unix-like systems)
 
-###Usage
+### Usage
 See [examples.cpp](https://github.com/eidheim/tiny-process-library/blob/master/examples.cpp).
 
 ### Get, compile and run
+
+#### Unix-like systems
 ```sh
 git clone git clone http://github.com/eidheim/tiny-process-library
 cd tiny-process-library
@@ -23,8 +25,11 @@ make
 ./examples
 ```
 
-####If using MSYS2 (https://msys2.github.io/)
-Replace `cmake .` above with
+#### Windows with MSYS2 (https://msys2.github.io/)
 ```sh
+git clone git clone http://github.com/eidheim/tiny-process-library
+cd tiny-process-library
 cmake -G"MSYS Makefiles" .
+make
+./examples
 ```
