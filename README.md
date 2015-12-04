@@ -18,7 +18,7 @@ See [examples.cpp](https://github.com/eidheim/tiny-process-library/blob/master/e
 
 #### Unix-like systems
 ```sh
-git clone git clone http://github.com/eidheim/tiny-process-library
+git clone http://github.com/eidheim/tiny-process-library
 cd tiny-process-library
 cmake .
 make
@@ -27,7 +27,7 @@ make
 
 #### Windows with MSYS2 (https://msys2.github.io/)
 ```sh
-git clone git clone http://github.com/eidheim/tiny-process-library
+git clone http://github.com/eidheim/tiny-process-library
 cd tiny-process-library
 cmake -G"MSYS Makefiles" .
 make
