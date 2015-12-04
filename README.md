@@ -22,3 +22,9 @@ cmake .
 make
 ./examples
 ```
+
+####If using MSYS2 (https://msys2.github.io/)
+Replace `cmake .` above with
+```sh
+cmake -G"MSYS Makefiles" .
+```
