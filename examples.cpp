@@ -41,7 +41,7 @@ int main() {
   //On Windows: install MSYS2 (https://msys2.github.io)
 #if !defined(_WIN32) || defined(MSYS_PROCESS_USE_SH)
   cout << endl << "Example 4 - multiple commands, stdout and stderr" << endl;
-  Process process4("echo something && ls an_incorrect_path", "", [](const char *bytes, size_t n) {
+  Process process4("echo Hello && ls an_incorrect_path", "", [](const char *bytes, size_t n) {
     cout << "Output from stdout: " << std::string(bytes, n);
   }, [](const char *bytes, size_t n) {
     cout << "Output from stderr: " << std::string(bytes, n);
@@ -55,8 +55,8 @@ int main() {
   Process process5("bash", "", [](const char *bytes, size_t n) {
     cout << "Output from stdout: " << std::string(bytes, n);
   }, nullptr, true);
-  process5.write_stdin("echo something_from_bash\n", 26);
-  process5.write_stdin("exit\n", 6);
+  process5.write_stdin("echo Hello from bash\n", 21);
+  process5.write_stdin("exit\n", 5);
   exit_code=process5.get_exit_code();
   cout << "Example 5 process returned: " << exit_code << endl;
   std::this_thread::sleep_for(std::chrono::seconds(5));
