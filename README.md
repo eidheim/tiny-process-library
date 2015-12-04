@@ -12,7 +12,7 @@ This library was created for, and is used by the C++ IDE project [juCi++](https:
 * Kill a running process
 
 ###Usage
-See [examples.cpp](http://github.com/eidheim/tiny-process-library/examples.cpp).
+See [examples.cpp](https://github.com/eidheim/tiny-process-library/blob/master/examples.cpp).
 
 ### Get, compile and run
 ```sh
