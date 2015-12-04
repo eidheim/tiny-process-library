@@ -8,8 +8,8 @@ This library was created for, and is used by the C++ IDE project [juCi++](https:
 * Simple to use
 * Platform independent
 * Read separately from stout and stderr using anonymous functions
-* Write to stdin of a new process
-* Kill a running process
+* Write to stdin
+* Kill a running process (SIGTERM is supported on Unix-like systems)
 
 ###Usage
 See [examples.cpp](https://github.com/eidheim/tiny-process-library/blob/master/examples.cpp).
