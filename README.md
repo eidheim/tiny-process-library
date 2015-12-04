@@ -10,6 +10,7 @@ This library was created for, and is used by the C++ IDE project [juCi++](https:
 * Read separately from stout and stderr using anonymous functions
 * Write to stdin
 * Kill a running process (SIGTERM is supported on Unix-like systems)
+* Correctly closes file descriptors/handles
 
 ### Usage
 See [examples.cpp](https://github.com/eidheim/tiny-process-library/blob/master/examples.cpp).
