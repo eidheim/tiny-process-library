@@ -38,3 +38,4 @@ compile_commands.json
 *.exe
 *.out
 *.app
+examples
