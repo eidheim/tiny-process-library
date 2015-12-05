@@ -4,12 +4,12 @@
 using namespace std;
 
 int main() {
-  cout << "Example 1 - simple echo process" << endl;
-  Process process1("echo \"Hello World\"", "", [](const char *bytes, size_t n) {
+  cout << "Example 1 - the mandatory Hello World" << endl;
+  Process process1("echo Hello World", "", [](const char *bytes, size_t n) {
     cout << "Output from stdout: " << std::string(bytes, n);
   });
   auto exit_code=process1.get_exit_code();
-  cout << "Example 1 process returned: " << exit_code << endl;
+  cout << "Example 1 process returned: " << exit_code << " (" << (exit_code==0?"success":"failure") << ")" << endl;
   std::this_thread::sleep_for(std::chrono::seconds(5));
   
   
@@ -20,7 +20,7 @@ int main() {
     cout << "Output from stderr: " << std::string(bytes, n);
   });
   exit_code=process2.get_exit_code();
-  cout << "Example 2 process returned: " << exit_code << endl;
+  cout << "Example 2 process returned: " << exit_code << " (" << (exit_code==0?"success":"failure") << ")" << endl;
   std::this_thread::sleep_for(std::chrono::seconds(5));
   
   
@@ -28,7 +28,7 @@ int main() {
   std::thread thread3([]() {
     Process process3("sleep 5");
     auto exit_code=process3.get_exit_code();
-    cout << "Example 3 process returned (" << (exit_code==0?"success":"failure") << "): " << exit_code << endl;
+    cout << "Example 3 process returned: " << exit_code << " (" << (exit_code==0?"success":"failure") << ")" << endl;
   });
   thread3.detach();
   std::this_thread::sleep_for(std::chrono::seconds(10));
@@ -38,7 +38,7 @@ int main() {
   auto process4=std::make_shared<Process>("sleep 10");
   std::thread thread4([process4]() {
     auto exit_code=process4->get_exit_code();
-    cout << "Example 4 process returned (" << (exit_code==0?"success":"failure") << "): " << exit_code << endl;
+    cout << "Example 4 process returned: " << exit_code << " (" << (exit_code==0?"success":"failure") << ")" << endl;
   });
   thread4.detach();
   std::this_thread::sleep_for(std::chrono::seconds(5));
@@ -56,7 +56,7 @@ int main() {
     cout << "Output from stderr: " << std::string(bytes, n);
   });
   exit_code=process5.get_exit_code();
-  cout << "Example 5 process returned: " << exit_code << endl;
+  cout << "Example 5 process returned: " << exit_code << " (" << (exit_code==0?"success":"failure") << ")" << endl;
   std::this_thread::sleep_for(std::chrono::seconds(5));
   
   
@@ -69,7 +69,7 @@ int main() {
   process6.write("echo Hello from bash\n");
   process6.write("exit\n");
   exit_code=process6.get_exit_code();
-  cout << "Example 6 process returned: " << exit_code << endl;
+  cout << "Example 6 process returned: " << exit_code << " (" << (exit_code==0?"success":"failure") << ")" << endl;
   std::this_thread::sleep_for(std::chrono::seconds(5));
   
   
@@ -82,7 +82,7 @@ int main() {
   process7.write("Hello cat\n");
   process7.close_stdin();
   exit_code=process7.get_exit_code();
-  cout << "Example 7 process returned: " << exit_code << endl;
+  cout << "Example 7 process returned: " << exit_code << " (" << (exit_code==0?"success":"failure") << ")" << endl;
   std::this_thread::sleep_for(std::chrono::seconds(5));
 #endif
   return 0;
