@@ -18,6 +18,9 @@ int main() {
     cout << "Output from stdout: " << std::string(bytes, n);
   }, [](const char *bytes, size_t n) {
     cout << "Output from stderr: " << std::string(bytes, n);
+    //add a newline for prettier output on some platforms:
+    if(bytes[n-1]!='\n')
+      cout << endl;
   });
   exit_code=process2.get_exit_code();
   cout << "Example 2 process returned: " << exit_code << " (" << (exit_code==0?"success":"failure") << ")" << endl;
@@ -54,6 +57,9 @@ int main() {
     cout << "Output from stdout: " << std::string(bytes, n);
   }, [](const char *bytes, size_t n) {
     cout << "Output from stderr: " << std::string(bytes, n);
+    //add a newline for prettier output on some platforms:
+    if(bytes[n-1]!='\n')
+      cout << endl;
   });
   exit_code=process5.get_exit_code();
   cout << "Example 5 process returned: " << exit_code << " (" << (exit_code==0?"success":"failure") << ")" << endl;
