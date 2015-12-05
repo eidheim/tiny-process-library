@@ -13,7 +13,7 @@ int main() {
   std::this_thread::sleep_for(std::chrono::seconds(5));
   
   
-  cout << endl << "Example 2 - stderr: cd into nonexistent directory" << endl;
+  cout << endl << "Example 2 - cd into nonexistent directory" << endl;
   Process process2("cd nonexistent_directory", "", [](const char *bytes, size_t n) {
     cout << "Output from stdout: " << std::string(bytes, n);
   }, [](const char *bytes, size_t n) {
