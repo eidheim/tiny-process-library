@@ -1,10 +1,10 @@
 # tiny-process-library
-A small platform independent library making it simple to create and stop new processes in C++, as well as writing to stdin and reading from stdout and stderr of the new process.
+A small platform independent library making it simple to create and stop new processes in C++, as well as writing to stdin and reading from stdout and stderr of a new process.
 
 This library was created for, and is used by the C++ IDE project [juCi++](https://github.com/cppit/jucipp).
 
 ### Features
-* No dependencies
+* No external dependencies
 * Simple to use
 * Platform independent
 * Read separately from stout and stderr using anonymous functions
