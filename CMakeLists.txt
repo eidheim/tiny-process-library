@@ -4,6 +4,8 @@ project(tiny-process-library)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
 
+find_package(Threads REQUIRED)
+
 set(source_files examples.cpp process.cc)
 
 #If compiled using MSYS2, use sh to run commands
@@ -15,3 +17,5 @@ else()
 endif()
 
 add_executable(examples ${source_files})
+
+target_link_libraries(examples ${CMAKE_THREAD_LIBS_INIT})
