@@ -100,15 +100,15 @@ void Process::async_read() {
   }
 }
 
-int Process::get_exit_code() {
+int Process::get_exit_status() {
   if(id<=0)
     return -1;
-  int exit_code;
-  waitpid(id, &exit_code, 0);
+  int exit_status;
+  waitpid(id, &exit_status, 0);
   
   close_all();
   
-  return exit_code;
+  return exit_status;
 }
 
 void Process::close_all() {

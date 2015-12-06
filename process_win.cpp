@@ -164,22 +164,22 @@ void Process::async_read() {
   }
 }
 
-int Process::get_exit_code() {
+int Process::get_exit_status() {
   if(id==0)
     return -1;
-  DWORD exit_code;
+  DWORD exit_status;
   HANDLE process_handle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, id);
   if(process_handle) {
     WaitForSingleObject(process_handle, INFINITE);
-    GetExitCodeProcess(process_handle, &exit_code);
+    GetExitCodeProcess(process_handle, &exit_status);
     CloseHandle(process_handle);
   }
   else
-    exit_code=-1;
+    exit_status=-1;
   
   close_all();
   
-  return static_cast<int>(exit_code);
+  return static_cast<int>(exit_status);
 }
 
 void Process::close_all() {

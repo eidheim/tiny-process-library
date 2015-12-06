@@ -10,8 +10,8 @@ int main() {
       if(std::string(bytes, n)!="Hello World\n") 
         stdout_error=true;
     });
-    auto exit_code=process.get_exit_code();
-    if(exit_code!=0) {
+    auto exit_status=process.get_exit_status();
+    if(exit_status!=0) {
       cerr << "Process returned failure." << endl;
       return 1;
     }

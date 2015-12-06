@@ -35,8 +35,8 @@ public:
   
   ///Get the process id of the started process.
   id_type get_id() {return id;}
-  ///Wait until process is finished, and return exit_code.
-  int get_exit_code();
+  ///Wait until process is finished, and return exit status.
+  int get_exit_status();
   ///Write to stdin.
   bool write(const char *bytes, size_t n);
   ///Write to stdin. Convenience function using write(const char *, size_t).
