@@ -60,6 +60,7 @@ private:
   id_type open(const std::string &command, const std::string &path);
   id_type id;
   void async_read();
+  void close_all();
 };
 
 #endif  // JUCI_PROCESS_H_

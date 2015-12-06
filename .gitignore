@@ -39,3 +39,4 @@ compile_commands.json
 *.out
 *.app
 examples
+open_close_test

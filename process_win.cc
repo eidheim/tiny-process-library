@@ -177,12 +177,19 @@ int Process::get_exit_code() {
   else
     exit_code=-1;
   
+  close_all();
+  
+  return static_cast<int>(exit_code);
+}
+
+void Process::close_all() {
   if(stdout_thread.joinable())
     stdout_thread.join();
   if(stderr_thread.joinable())
     stderr_thread.join();
   
-  close_stdin();
+  if(stdin_fd)
+    close_stdin();
   if(stdout_fd) {
     CloseHandle(*stdout_fd);
     stdout_fd.reset();
@@ -191,8 +198,6 @@ int Process::get_exit_code() {
     CloseHandle(*stderr_fd);
     stderr_fd.reset();
   }
-  
-  return static_cast<int>(exit_code);
 }
 
 bool Process::write(const char *bytes, size_t n) {

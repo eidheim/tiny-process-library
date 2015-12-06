@@ -106,12 +106,19 @@ int Process::get_exit_code() {
   int exit_code;
   waitpid(id, &exit_code, 0);
   
+  close_all();
+  
+  return exit_code;
+}
+
+void Process::close_all() {
   if(stdout_thread.joinable())
     stdout_thread.join();
   if(stderr_thread.joinable())
     stderr_thread.join();
   
-  close_stdin();
+  if(stdin_fd)
+    close_stdin();
   if(stdout_fd) {
     close(*stdout_fd);
     stdout_fd.reset();
@@ -120,8 +127,6 @@ int Process::get_exit_code() {
     close(*stderr_fd);
     stderr_fd.reset();
   }
-  
-  return exit_code;
 }
 
 bool Process::write(const char *bytes, size_t n) {

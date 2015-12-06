@@ -19,3 +19,6 @@ endif()
 add_executable(examples ${source_files})
 
 target_link_libraries(examples ${CMAKE_THREAD_LIBS_INIT})
+
+enable_testing()
+add_subdirectory(test)
