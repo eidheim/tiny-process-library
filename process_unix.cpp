@@ -1,4 +1,4 @@
-#include "process.h"
+#include "process.hpp"
 #include <cstdlib>
 #include <unistd.h>
 #include <signal.h>
