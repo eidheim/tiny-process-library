@@ -6,11 +6,11 @@ using namespace std;
 int main() {
   bool stdout_error=false;
   for(size_t c=0;c<10000;c++) {
-    Process process1("echo Hello World", "", [&stdout_error](const char *bytes, size_t n) {
+    Process process("echo Hello World", "", [&stdout_error](const char *bytes, size_t n) {
       if(std::string(bytes, n)!="Hello World\n") 
         stdout_error=true;
     });
-    auto exit_code=process1.get_exit_code();
+    auto exit_code=process.get_exit_code();
     if(exit_code!=0) {
       cerr << "Process returned failure." << endl;
       return 1;
