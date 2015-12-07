@@ -45,7 +45,7 @@ int main() {
   });
   thread4.detach();
   std::this_thread::sleep_for(std::chrono::seconds(5));
-  Process::kill(process4->get_id());
+  process4->kill();
   std::this_thread::sleep_for(std::chrono::seconds(5));
   
   
