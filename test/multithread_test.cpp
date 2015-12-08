@@ -18,10 +18,10 @@ int main() {
         }, [](const char *bytes, size_t n) {
         }, true);
         auto exit_status=process.get_exit_status();
-        if(exit_status!=0) {
+        if(exit_status!=0)
           exit_status_error=true;
+        if(exit_status_error)
           return;
-        }
         if(stdout_error)
           return;
       }
