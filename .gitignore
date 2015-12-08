@@ -40,3 +40,4 @@ compile_commands.json
 *.app
 examples
 open_close_test
+multithread_test
