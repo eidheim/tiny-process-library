@@ -1,8 +1,5 @@
 #include "process.hpp"
 
-#include <iostream> //TODO: remove
-using namespace std; //TODO: remove
-
 Process::Process(const std::string &command, const std::string &path,
                  std::function<void(const char* bytes, size_t n)> read_stdout,
                  std::function<void(const char* bytes, size_t n)> read_stderr,

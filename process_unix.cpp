@@ -2,9 +2,7 @@
 #include <cstdlib>
 #include <unistd.h>
 #include <signal.h>
-
-#include <iostream> //TODO: remove
-using namespace std; //TODO: remove
+#include <stdexcept>
 
 Process::Data::Data(): id(-1) {}
 
@@ -142,6 +140,8 @@ void Process::close_fds() {
 }
 
 bool Process::write(const char *bytes, size_t n) {
+  if(!open_stdin)
+    throw std::invalid_argument("Can't write to an unopened stdin pipe. Please set open_stdin=true when constructing the process.");
   stdin_mutex.lock();
   if(stdin_fd) {
     if(::write(*stdin_fd, bytes, n)>=0) {

@@ -1,9 +1,7 @@
 #include "process.hpp"
 #include <cstring>
 #include "TlHelp32.h"
-
-#include <iostream> //TODO: remove
-using namespace std; //TODO: remove
+#include <stdexcept>
 
 Process::Data::Data(): id(0), handle(NULL) {}
 
@@ -209,6 +207,8 @@ void Process::close_fds() {
 }
 
 bool Process::write(const char *bytes, size_t n) {
+  if(!open_stdin)
+    throw std::invalid_argument("Can't write to an unopened stdin pipe. Please set open_stdin=true when constructing the process.");
   stdin_mutex.lock();
   if(stdin_fd) {
     DWORD written;
