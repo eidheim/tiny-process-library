@@ -65,7 +65,7 @@ Process::id_type Process::open(const std::string &command, const std::string &pa
         path_escaped.replace(pos, 1, "'\\''");
         pos+=4;
       }
-      execl("/bin/sh", "sh", "-c", ("cd \'"+path_escaped+"\' && "+command).c_str(), NULL);
+      execl("/bin/sh", "sh", "-c", ("cd '"+path_escaped+"' && "+command).c_str(), NULL);
     }
     else
       execl("/bin/sh", "sh", "-c", command.c_str(), NULL);
