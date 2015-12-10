@@ -61,11 +61,11 @@ Process::id_type Process::open(const std::string &command, const std::string &pa
       auto path_escaped=path;
       size_t pos=0;
       //Based on https://www.reddit.com/r/cpp/comments/3vpjqg/a_new_platform_independent_process_library_for_c11/cxsxyb7
-      while((pos=path_escaped.find('\"', pos))!=std::string::npos) {
-        path_escaped.insert(pos, "\\");
-        pos+=2;
+      while((pos=path_escaped.find('\'', pos))!=std::string::npos) {
+        path_escaped.replace(pos, 1, "'\\''");
+        pos+=4;
       }
-      execl("/bin/sh", "sh", "-c", ("cd \""+path_escaped+"\" && "+command).c_str(), NULL);
+      execl("/bin/sh", "sh", "-c", ("cd \'"+path_escaped+"\' && "+command).c_str(), NULL);
     }
     else
       execl("/bin/sh", "sh", "-c", command.c_str(), NULL);
