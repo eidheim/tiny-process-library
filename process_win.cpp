@@ -5,6 +5,9 @@
 
 Process::Data::Data(): id(0), handle(NULL) {}
 
+//Based on the discussion thread: https://www.reddit.com/r/cpp/comments/3vpjqg/a_new_platform_independent_process_library_for_c11/cxq1wsj
+std::mutex create_process_mutex;
+
 //Based on the example at https://msdn.microsoft.com/en-us/library/windows/desktop/ms682499(v=vs.85).aspx.
 Process::id_type Process::open(const std::string &command, const std::string &path) {
   if(open_stdin)
@@ -27,22 +30,28 @@ Process::id_type Process::open(const std::string &command, const std::string &pa
   security_attributes.bInheritHandle = TRUE;
   security_attributes.lpSecurityDescriptor = NULL;
 
+  create_process_mutex.lock();
   if(stdin_fd) {
-    if (!CreatePipe(&stdin_rd_p, &stdin_wr_p, &security_attributes, 0))
+    if (!CreatePipe(&stdin_rd_p, &stdin_wr_p, &security_attributes, 0)) {
+      create_process_mutex.unlock();
       return 0;
+    }
     if(!SetHandleInformation(stdin_wr_p, HANDLE_FLAG_INHERIT, 0)) {
       CloseHandle(stdin_rd_p);CloseHandle(stdin_wr_p);
+      create_process_mutex.unlock();
       return 0;
     }
   }
   if(stdout_fd) {
     if (!CreatePipe(&stdout_rd_p, &stdout_wr_p, &security_attributes, 0)) {
       if(stdin_fd) {CloseHandle(stdin_rd_p);CloseHandle(stdin_wr_p);}
+      create_process_mutex.unlock();
       return 0;
     }
     if(!SetHandleInformation(stdout_rd_p, HANDLE_FLAG_INHERIT, 0)) {
       if(stdin_fd) {CloseHandle(stdin_rd_p);CloseHandle(stdin_wr_p);}
       CloseHandle(stdout_rd_p);CloseHandle(stdout_wr_p);
+      create_process_mutex.unlock();
       return 0;
     }
   }
@@ -50,12 +59,14 @@ Process::id_type Process::open(const std::string &command, const std::string &pa
     if (!CreatePipe(&stderr_rd_p, &stderr_wr_p, &security_attributes, 0)) {
       if(stdin_fd) {CloseHandle(stdin_rd_p);CloseHandle(stdin_wr_p);}
       if(stdout_fd) {CloseHandle(stdout_rd_p);CloseHandle(stdout_wr_p);}
+      create_process_mutex.unlock();
       return 0;
     }
     if(!SetHandleInformation(stderr_rd_p, HANDLE_FLAG_INHERIT, 0)) {
       if(stdin_fd) {CloseHandle(stdin_rd_p);CloseHandle(stdin_wr_p);}
       if(stdout_fd) {CloseHandle(stdout_rd_p);CloseHandle(stdout_wr_p);}
       CloseHandle(stderr_rd_p);CloseHandle(stderr_wr_p);
+      create_process_mutex.unlock();
       return 0;
     }
   }
@@ -114,6 +125,7 @@ Process::id_type Process::open(const std::string &command, const std::string &pa
     if(stdin_fd) {CloseHandle(stdin_rd_p);CloseHandle(stdin_wr_p);}
     if(stdout_fd) {CloseHandle(stdout_rd_p);CloseHandle(stdout_wr_p);}
     if(stderr_fd) {CloseHandle(stderr_rd_p);CloseHandle(stderr_wr_p);}
+    create_process_mutex.unlock();
     return 0;
   }
   else {
@@ -121,6 +133,7 @@ Process::id_type Process::open(const std::string &command, const std::string &pa
     if(stdin_fd) CloseHandle(stdin_rd_p);
     if(stdout_fd) CloseHandle(stdout_wr_p);
     if(stderr_fd) CloseHandle(stderr_wr_p);
+    create_process_mutex.unlock();
   }
 
   if(stdin_fd) *stdin_fd=stdin_wr_p;
