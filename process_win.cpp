@@ -1,6 +1,6 @@
 #include "process.hpp"
 #include <cstring>
-#include "TlHelp32.h"
+#include <TlHelp32.h>
 #include <stdexcept>
 
 Process::Data::Data(): id(0), handle(NULL) {}
