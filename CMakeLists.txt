@@ -8,10 +8,12 @@ find_package(Threads REQUIRED)
 
 set(process_source_files ${CMAKE_SOURCE_DIR}/process.cpp)
 
-#If compiled using MSYS2, use sh to run commands
-if(MSYS)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMSYS_PROCESS_USE_SH")
+if(WIN32)
   list(APPEND process_source_files ${CMAKE_SOURCE_DIR}/process_win.cpp)
+  #If compiled using MSYS2, use sh to run commands
+  if(MSYS)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMSYS_PROCESS_USE_SH")
+  endif()
 else()
   list(APPEND process_source_files ${CMAKE_SOURCE_DIR}/process_unix.cpp)
 endif()
