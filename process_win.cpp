@@ -152,24 +152,24 @@ void Process::async_read() {
   if(stdout_fd) {
     stdout_thread=std::thread([this](){
       DWORD n;
-      char buffer[buffer_size];
+      std::unique_ptr<char> buffer(new char[buffer_size]);
       for (;;) {
-        BOOL bSuccess = ReadFile(*stdout_fd, static_cast<CHAR*>(buffer), static_cast<DWORD>(buffer_size), &n, NULL);
+        BOOL bSuccess = ReadFile(*stdout_fd, static_cast<CHAR*>(buffer.get()), static_cast<DWORD>(buffer_size), &n, NULL);
         if(!bSuccess || n == 0)
           break;
-        read_stdout(buffer, static_cast<size_t>(n));
+        read_stdout(buffer.get(), static_cast<size_t>(n));
       }
     });
   }
   if(stderr_fd) {
     stderr_thread=std::thread([this](){
       DWORD n;
-      char buffer[buffer_size];
+      std::unique_ptr<char> buffer(new char[buffer_size]);
       for (;;) {
-        BOOL bSuccess = ReadFile(*stderr_fd, static_cast<CHAR*>(buffer), static_cast<DWORD>(buffer_size), &n, NULL);
+        BOOL bSuccess = ReadFile(*stderr_fd, static_cast<CHAR*>(buffer.get()), static_cast<DWORD>(buffer_size), &n, NULL);
         if(!bSuccess || n == 0)
           break;
-        read_stderr(buffer, static_cast<size_t>(n));
+        read_stderr(buffer.get(), static_cast<size_t>(n));
       }
     });
   }
