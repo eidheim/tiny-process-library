@@ -112,12 +112,12 @@ int Process::get_exit_status() {
     return -1;
   int exit_status;
   waitpid(data.id, &exit_status, 0);
-  close_mutex.lock();
-  closed=true;
-  close_mutex.unlock();
-  
+  {
+    std::lock_guard<std::mutex> hold(close_mutex);
+    closed=true;
+  }
   close_fds();
-  
+
   return exit_status;
 }
 
@@ -142,39 +142,35 @@ void Process::close_fds() {
 bool Process::write(const char *bytes, size_t n) {
   if(!open_stdin)
     throw std::invalid_argument("Can't write to an unopened stdin pipe. Please set open_stdin=true when constructing the process.");
-  stdin_mutex.lock();
+
+  std::lock_guard<std::mutex> hold(stdin_mutex);
   if(stdin_fd) {
     if(::write(*stdin_fd, bytes, n)>=0) {
-      stdin_mutex.unlock();
       return true;
     }
     else {
-      stdin_mutex.unlock();
       return false;
     }
   }
-  stdin_mutex.unlock();
   return false;
 }
 
 void Process::close_stdin() {
-  stdin_mutex.lock();
+  std::lock_guard<std::mutex> hold(stdin_mutex);
   if(stdin_fd) {
     close(*stdin_fd);
     stdin_fd.reset();
   }
-  stdin_mutex.unlock();
 }
 
 void Process::kill(bool force) {
-  close_mutex.lock();
+  std::lock_guard<std::mutex> hold(close_mutex);
   if(data.id>0 && !closed) {
     if(force)
       ::kill(-data.id, SIGTERM);
     else
       ::kill(-data.id, SIGINT);
   }
-  close_mutex.unlock();
 }
 
 void Process::kill(id_type id, bool force) {
