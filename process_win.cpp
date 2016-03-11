@@ -30,7 +30,7 @@ Process::id_type Process::open(const std::string &command, const std::string &pa
   security_attributes.bInheritHandle = TRUE;
   security_attributes.lpSecurityDescriptor = NULL;
 
-  std::lock_guard<std::mutex> hold(create_process_mutex);
+  std::lock_guard<std::mutex> lock(create_process_mutex);
   if(stdin_fd) {
     if (!CreatePipe(&stdin_rd_p, &stdin_wr_p, &security_attributes, 0)) {
       return 0;
@@ -175,7 +175,7 @@ int Process::get_exit_status() {
   if(!GetExitCodeProcess(data.handle, &exit_status))
     exit_status=-1;
   {
-    std::lock_guard<std::mutex> hold(close_mutex);
+    std::lock_guard<std::mutex> lock(close_mutex);
     CloseHandle(data.handle);
     closed=true;
   }
@@ -206,7 +206,7 @@ bool Process::write(const char *bytes, size_t n) {
   if(!open_stdin)
     throw std::invalid_argument("Can't write to an unopened stdin pipe. Please set open_stdin=true when constructing the process.");
 
-  std::lock_guard<std::mutex> hold(stdin_mutex);
+  std::lock_guard<std::mutex> lock(stdin_mutex);
   if(stdin_fd) {
     DWORD written;
     BOOL bSuccess=WriteFile(*stdin_fd, bytes, static_cast<DWORD>(n), &written, NULL);
@@ -221,7 +221,7 @@ bool Process::write(const char *bytes, size_t n) {
 }
 
 void Process::close_stdin() {
-  std::lock_guard<std::mutex> hold(stdin_mutex);
+  std::lock_guard<std::mutex> lock(stdin_mutex);
   if(stdin_fd) {
     CloseHandle(*stdin_fd);
     stdin_fd.reset();
@@ -230,7 +230,7 @@ void Process::close_stdin() {
 
 //Based on http://stackoverflow.com/a/1173396
 void Process::kill(bool force) {
-  std::lock_guard<std::mutex> hold(close_mutex);
+  std::lock_guard<std::mutex> lock(close_mutex);
   if(data.id>0 && !closed) {
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if(snapshot) {
