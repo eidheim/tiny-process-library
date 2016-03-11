@@ -30,28 +30,24 @@ Process::id_type Process::open(const std::string &command, const std::string &pa
   security_attributes.bInheritHandle = TRUE;
   security_attributes.lpSecurityDescriptor = NULL;
 
-  create_process_mutex.lock();
+  std::lock_guard<std::mutex> hold(create_process_mutex);
   if(stdin_fd) {
     if (!CreatePipe(&stdin_rd_p, &stdin_wr_p, &security_attributes, 0)) {
-      create_process_mutex.unlock();
       return 0;
     }
     if(!SetHandleInformation(stdin_wr_p, HANDLE_FLAG_INHERIT, 0)) {
       CloseHandle(stdin_rd_p);CloseHandle(stdin_wr_p);
-      create_process_mutex.unlock();
       return 0;
     }
   }
   if(stdout_fd) {
     if (!CreatePipe(&stdout_rd_p, &stdout_wr_p, &security_attributes, 0)) {
       if(stdin_fd) {CloseHandle(stdin_rd_p);CloseHandle(stdin_wr_p);}
-      create_process_mutex.unlock();
       return 0;
     }
     if(!SetHandleInformation(stdout_rd_p, HANDLE_FLAG_INHERIT, 0)) {
       if(stdin_fd) {CloseHandle(stdin_rd_p);CloseHandle(stdin_wr_p);}
       CloseHandle(stdout_rd_p);CloseHandle(stdout_wr_p);
-      create_process_mutex.unlock();
       return 0;
     }
   }
@@ -59,14 +55,12 @@ Process::id_type Process::open(const std::string &command, const std::string &pa
     if (!CreatePipe(&stderr_rd_p, &stderr_wr_p, &security_attributes, 0)) {
       if(stdin_fd) {CloseHandle(stdin_rd_p);CloseHandle(stdin_wr_p);}
       if(stdout_fd) {CloseHandle(stdout_rd_p);CloseHandle(stdout_wr_p);}
-      create_process_mutex.unlock();
       return 0;
     }
     if(!SetHandleInformation(stderr_rd_p, HANDLE_FLAG_INHERIT, 0)) {
       if(stdin_fd) {CloseHandle(stdin_rd_p);CloseHandle(stdin_wr_p);}
       if(stdout_fd) {CloseHandle(stdout_rd_p);CloseHandle(stdout_wr_p);}
       CloseHandle(stderr_rd_p);CloseHandle(stderr_wr_p);
-      create_process_mutex.unlock();
       return 0;
     }
   }
@@ -125,7 +119,6 @@ Process::id_type Process::open(const std::string &command, const std::string &pa
     if(stdin_fd) {CloseHandle(stdin_rd_p);CloseHandle(stdin_wr_p);}
     if(stdout_fd) {CloseHandle(stdout_rd_p);CloseHandle(stdout_wr_p);}
     if(stderr_fd) {CloseHandle(stderr_rd_p);CloseHandle(stderr_wr_p);}
-    create_process_mutex.unlock();
     return 0;
   }
   else {
@@ -133,7 +126,6 @@ Process::id_type Process::open(const std::string &command, const std::string &pa
     if(stdin_fd) CloseHandle(stdin_rd_p);
     if(stdout_fd) CloseHandle(stdout_wr_p);
     if(stderr_fd) CloseHandle(stderr_wr_p);
-    create_process_mutex.unlock();
   }
 
   if(stdin_fd) *stdin_fd=stdin_wr_p;
@@ -182,13 +174,13 @@ int Process::get_exit_status() {
   WaitForSingleObject(data.handle, INFINITE);
   if(!GetExitCodeProcess(data.handle, &exit_status))
     exit_status=-1;
-  close_mutex.lock();
-  CloseHandle(data.handle);
-  closed=true;
-  close_mutex.unlock();
-  
+  {
+    std::lock_guard<std::mutex> hold(close_mutex);
+    CloseHandle(data.handle);
+    closed=true;
+  }
   close_fds();
-  
+
   return static_cast<int>(exit_status);
 }
 
@@ -213,35 +205,32 @@ void Process::close_fds() {
 bool Process::write(const char *bytes, size_t n) {
   if(!open_stdin)
     throw std::invalid_argument("Can't write to an unopened stdin pipe. Please set open_stdin=true when constructing the process.");
-  stdin_mutex.lock();
+
+  std::lock_guard<std::mutex> hold(stdin_mutex);
   if(stdin_fd) {
     DWORD written;
     BOOL bSuccess=WriteFile(*stdin_fd, bytes, static_cast<DWORD>(n), &written, NULL);
     if(!bSuccess || written==0) {
-      stdin_mutex.unlock();
       return false;
     }
     else {
-      stdin_mutex.unlock();
       return true;
     }
   }
-  stdin_mutex.unlock();
   return false;
 }
 
 void Process::close_stdin() {
-  stdin_mutex.lock();
+  std::lock_guard<std::mutex> hold(stdin_mutex);
   if(stdin_fd) {
     CloseHandle(*stdin_fd);
     stdin_fd.reset();
   }
-  stdin_mutex.unlock();
 }
 
 //Based on http://stackoverflow.com/a/1173396
 void Process::kill(bool force) {
-  close_mutex.lock();
+  std::lock_guard<std::mutex> hold(close_mutex);
   if(data.id>0 && !closed) {
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if(snapshot) {
@@ -259,7 +248,6 @@ void Process::kill(bool force) {
     }
     TerminateProcess(data.handle, 2);
   }
-  close_mutex.unlock();
 }
 
 //Based on http://stackoverflow.com/a/1173396
