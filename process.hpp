@@ -69,7 +69,7 @@ private:
   std::thread stdout_thread, stderr_thread;
   bool open_stdin;
   std::mutex stdin_mutex;
-  const size_t buffer_size;
+  size_t buffer_size;
   
   std::unique_ptr<fd_type> stdout_fd, stderr_fd, stdin_fd;
   

@@ -152,7 +152,7 @@ void Process::async_read() {
   if(stdout_fd) {
     stdout_thread=std::thread([this](){
       DWORD n;
-      std::unique_ptr<char> buffer(new char[buffer_size]);
+      std::unique_ptr<char[]> buffer(new char[buffer_size]);
       for (;;) {
         BOOL bSuccess = ReadFile(*stdout_fd, static_cast<CHAR*>(buffer.get()), static_cast<DWORD>(buffer_size), &n, NULL);
         if(!bSuccess || n == 0)
@@ -164,7 +164,7 @@ void Process::async_read() {
   if(stderr_fd) {
     stderr_thread=std::thread([this](){
       DWORD n;
-      std::unique_ptr<char> buffer(new char[buffer_size]);
+      std::unique_ptr<char[]> buffer(new char[buffer_size]);
       for (;;) {
         BOOL bSuccess = ReadFile(*stderr_fd, static_cast<CHAR*>(buffer.get()), static_cast<DWORD>(buffer_size), &n, NULL);
         if(!bSuccess || n == 0)
