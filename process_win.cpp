@@ -5,8 +5,34 @@
 
 Process::Data::Data(): id(0), handle(NULL) {}
 
+namespace {
+
+// Simple HANDLE wrapper to close it automatically from the destructor.
+class Handle {
+public:
+  Handle() : handle(INVALID_HANDLE_VALUE) { }
+  ~Handle() {
+    close();
+  }
+  void close() {
+    if (handle != INVALID_HANDLE_VALUE)
+      ::CloseHandle(handle);
+  }
+  HANDLE detach() {
+    HANDLE old_handle = handle;
+    handle = nullptr;
+    return old_handle;
+  }
+  operator HANDLE() const { return handle; }
+  HANDLE* operator&() { return &handle; }
+private:
+  HANDLE handle;
+};
+
 //Based on the discussion thread: https://www.reddit.com/r/cpp/comments/3vpjqg/a_new_platform_independent_process_library_for_c11/cxq1wsj
 std::mutex create_process_mutex;
+
+}
 
 //Based on the example at https://msdn.microsoft.com/en-us/library/windows/desktop/ms682499(v=vs.85).aspx.
 Process::id_type Process::open(const std::string &command, const std::string &path) {
@@ -17,12 +43,12 @@ Process::id_type Process::open(const std::string &command, const std::string &pa
   if(read_stderr)
     stderr_fd=std::unique_ptr<fd_type>(new fd_type);
 
-  HANDLE stdin_rd_p = NULL;
-  HANDLE stdin_wr_p = NULL;
-  HANDLE stdout_rd_p = NULL;
-  HANDLE stdout_wr_p = NULL;
-  HANDLE stderr_rd_p = NULL;
-  HANDLE stderr_wr_p = NULL;
+  Handle stdin_rd_p;
+  Handle stdin_wr_p;
+  Handle stdout_rd_p;
+  Handle stdout_wr_p;
+  Handle stderr_rd_p;
+  Handle stderr_wr_p;
 
   SECURITY_ATTRIBUTES security_attributes;
 
@@ -32,52 +58,36 @@ Process::id_type Process::open(const std::string &command, const std::string &pa
 
   std::lock_guard<std::mutex> lock(create_process_mutex);
   if(stdin_fd) {
-    if (!CreatePipe(&stdin_rd_p, &stdin_wr_p, &security_attributes, 0)) {
+    if (!CreatePipe(&stdin_rd_p, &stdin_wr_p, &security_attributes, 0) ||
+        !SetHandleInformation(stdin_wr_p, HANDLE_FLAG_INHERIT, 0))
       return 0;
-    }
-    if(!SetHandleInformation(stdin_wr_p, HANDLE_FLAG_INHERIT, 0)) {
-      CloseHandle(stdin_rd_p);CloseHandle(stdin_wr_p);
-      return 0;
-    }
   }
   if(stdout_fd) {
-    if (!CreatePipe(&stdout_rd_p, &stdout_wr_p, &security_attributes, 0)) {
-      if(stdin_fd) {CloseHandle(stdin_rd_p);CloseHandle(stdin_wr_p);}
-      return 0;
-    }
-    if(!SetHandleInformation(stdout_rd_p, HANDLE_FLAG_INHERIT, 0)) {
-      if(stdin_fd) {CloseHandle(stdin_rd_p);CloseHandle(stdin_wr_p);}
-      CloseHandle(stdout_rd_p);CloseHandle(stdout_wr_p);
+    if (!CreatePipe(&stdout_rd_p, &stdout_wr_p, &security_attributes, 0) ||
+        !SetHandleInformation(stdout_rd_p, HANDLE_FLAG_INHERIT, 0)) {
       return 0;
     }
   }
   if(stderr_fd) {
-    if (!CreatePipe(&stderr_rd_p, &stderr_wr_p, &security_attributes, 0)) {
-      if(stdin_fd) {CloseHandle(stdin_rd_p);CloseHandle(stdin_wr_p);}
-      if(stdout_fd) {CloseHandle(stdout_rd_p);CloseHandle(stdout_wr_p);}
-      return 0;
-    }
-    if(!SetHandleInformation(stderr_rd_p, HANDLE_FLAG_INHERIT, 0)) {
-      if(stdin_fd) {CloseHandle(stdin_rd_p);CloseHandle(stdin_wr_p);}
-      if(stdout_fd) {CloseHandle(stdout_rd_p);CloseHandle(stdout_wr_p);}
-      CloseHandle(stderr_rd_p);CloseHandle(stderr_wr_p);
+    if (!CreatePipe(&stderr_rd_p, &stderr_wr_p, &security_attributes, 0) ||
+        !SetHandleInformation(stderr_rd_p, HANDLE_FLAG_INHERIT, 0)) {
       return 0;
     }
   }
-  
+
   PROCESS_INFORMATION process_info;
   STARTUPINFO startup_info;
-  
+
   ZeroMemory(&process_info, sizeof(PROCESS_INFORMATION));
-  
+
   ZeroMemory(&startup_info, sizeof(STARTUPINFO));
   startup_info.cb = sizeof(STARTUPINFO);
-  startup_info.hStdInput = stdin_fd?stdin_rd_p:INVALID_HANDLE_VALUE;
-  startup_info.hStdOutput = stdout_fd?stdout_wr_p:INVALID_HANDLE_VALUE;
-  startup_info.hStdError = stderr_fd?stderr_wr_p:INVALID_HANDLE_VALUE;
+  startup_info.hStdInput = stdin_rd_p;
+  startup_info.hStdOutput = stdout_wr_p;
+  startup_info.hStdError = stderr_wr_p;
   if(stdin_fd || stdout_fd || stderr_fd)
     startup_info.dwFlags |= STARTF_USESTDHANDLES;
-  
+
   char* path_cstr;
   if(path=="")
     path_cstr=NULL;
@@ -112,26 +122,20 @@ Process::id_type Process::open(const std::string &command, const std::string &pa
                                 NULL, path_cstr, &startup_info, &process_info);
   delete[] path_cstr;
   delete[] command_cstr;
-  
+
   if(!bSuccess) {
     CloseHandle(process_info.hProcess);
     CloseHandle(process_info.hThread);
-    if(stdin_fd) {CloseHandle(stdin_rd_p);CloseHandle(stdin_wr_p);}
-    if(stdout_fd) {CloseHandle(stdout_rd_p);CloseHandle(stdout_wr_p);}
-    if(stderr_fd) {CloseHandle(stderr_rd_p);CloseHandle(stderr_wr_p);}
     return 0;
   }
   else {
     CloseHandle(process_info.hThread);
-    if(stdin_fd) CloseHandle(stdin_rd_p);
-    if(stdout_fd) CloseHandle(stdout_wr_p);
-    if(stderr_fd) CloseHandle(stderr_wr_p);
   }
 
-  if(stdin_fd) *stdin_fd=stdin_wr_p;
-  if(stdout_fd) *stdout_fd=stdout_rd_p;
-  if(stderr_fd) *stderr_fd=stderr_rd_p;
-  
+  if(stdin_fd) *stdin_fd=stdin_wr_p.detach();
+  if(stdout_fd) *stdout_fd=stdout_rd_p.detach();
+  if(stderr_fd) *stderr_fd=stderr_rd_p.detach();
+
   closed=false;
   data.id=process_info.dwProcessId;
   data.handle=process_info.hProcess;
