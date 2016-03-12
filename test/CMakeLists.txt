@@ -1,10 +1,10 @@
 include_directories(..)
 
-add_executable(open_close_test open_close_test.cpp ${process_source_files})
-target_link_libraries(open_close_test ${CMAKE_THREAD_LIBS_INIT})
+function(add_tiny_test name)
+  add_executable(${name} ${name}.cpp)
+  target_link_libraries(${name} tiny-process-library)
+  add_test(${name} ${name})
+endfunction()
 
-add_executable(multithread_test multithread_test.cpp ${process_source_files})
-target_link_libraries(multithread_test ${CMAKE_THREAD_LIBS_INIT})
-
-add_test(open_close_test open_close_test)
-add_test(multithread_test multithread_test)
+add_tiny_test(open_close_test)
+add_tiny_test(multithread_test)
