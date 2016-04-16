@@ -5,7 +5,7 @@ project(tiny-process-library)
 if(MSVC)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 else()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -Wno-unused-parameter")
 endif()
 
 find_package(Threads REQUIRED)
