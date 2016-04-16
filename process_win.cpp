@@ -192,12 +192,12 @@ void Process::close_fds() {
   
   if(stdin_fd)
     close_stdin();
-  if(stdout_fd && *stdout_fd != NULL) {
-    CloseHandle(*stdout_fd);
+  if(stdout_fd) {
+    if(*stdout_fd!=NULL) CloseHandle(*stdout_fd);
     stdout_fd.reset();
   }
-  if(stderr_fd && *stderr_fd != NULL) {
-    CloseHandle(*stderr_fd);
+  if(stderr_fd) {
+    if(*stderr_fd!=NULL) CloseHandle(*stderr_fd);
     stderr_fd.reset();
   }
 }
@@ -222,8 +222,8 @@ bool Process::write(const char *bytes, size_t n) {
 
 void Process::close_stdin() {
   std::lock_guard<std::mutex> lock(stdin_mutex);
-  if(stdin_fd && *stdin_fd != NULL) {
-    CloseHandle(*stdin_fd);
+  if(stdin_fd) {
+    if(*stdin_fd!=NULL) CloseHandle(*stdin_fd);
     stdin_fd.reset();
   }
 }
