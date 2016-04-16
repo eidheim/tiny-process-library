@@ -20,7 +20,7 @@ public:
   }
   HANDLE detach() {
     HANDLE old_handle = handle;
-    handle = nullptr;
+    handle = INVALID_HANDLE_VALUE;
     return old_handle;
   }
   operator HANDLE() const { return handle; }
