@@ -37,11 +37,11 @@ std::mutex create_process_mutex;
 //Based on the example at https://msdn.microsoft.com/en-us/library/windows/desktop/ms682499(v=vs.85).aspx.
 Process::id_type Process::open(const std::string &command, const std::string &path) {
   if(open_stdin)
-    stdin_fd=std::unique_ptr<fd_type>(new fd_type);
+    stdin_fd=std::unique_ptr<fd_type>(new fd_type(NULL));
   if(read_stdout)
-    stdout_fd=std::unique_ptr<fd_type>(new fd_type);
+    stdout_fd=std::unique_ptr<fd_type>(new fd_type(NULL));
   if(read_stderr)
-    stderr_fd=std::unique_ptr<fd_type>(new fd_type);
+    stderr_fd=std::unique_ptr<fd_type>(new fd_type(NULL));
 
   Handle stdin_rd_p;
   Handle stdin_wr_p;
@@ -197,11 +197,11 @@ void Process::close_fds() {
   if(stdin_fd)
     close_stdin();
   if(stdout_fd) {
-    CloseHandle(*stdout_fd);
+    if(*stdout_fd!=NULL) CloseHandle(*stdout_fd);
     stdout_fd.reset();
   }
   if(stderr_fd) {
-    CloseHandle(*stderr_fd);
+    if(*stderr_fd!=NULL) CloseHandle(*stderr_fd);
     stderr_fd.reset();
   }
 }
@@ -227,7 +227,7 @@ bool Process::write(const char *bytes, size_t n) {
 void Process::close_stdin() {
   std::lock_guard<std::mutex> lock(stdin_mutex);
   if(stdin_fd) {
-    CloseHandle(*stdin_fd);
+    if(*stdin_fd!=NULL) CloseHandle(*stdin_fd);
     stdin_fd.reset();
   }
 }
