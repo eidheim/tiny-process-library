@@ -6,32 +6,30 @@
 Process::Data::Data(): id(0), handle(NULL) {}
 
 namespace {
-
-// Simple HANDLE wrapper to close it automatically from the destructor.
-class Handle {
-public:
-  Handle() : handle(INVALID_HANDLE_VALUE) { }
-  ~Handle() {
-    close();
-  }
-  void close() {
-    if (handle != INVALID_HANDLE_VALUE)
-      ::CloseHandle(handle);
-  }
-  HANDLE detach() {
-    HANDLE old_handle = handle;
-    handle = INVALID_HANDLE_VALUE;
-    return old_handle;
-  }
-  operator HANDLE() const { return handle; }
-  HANDLE* operator&() { return &handle; }
-private:
-  HANDLE handle;
-};
-
-//Based on the discussion thread: https://www.reddit.com/r/cpp/comments/3vpjqg/a_new_platform_independent_process_library_for_c11/cxq1wsj
-std::mutex create_process_mutex;
-
+  // Simple HANDLE wrapper to close it automatically from the destructor.
+  class Handle {
+  public:
+    Handle() : handle(INVALID_HANDLE_VALUE) { }
+    ~Handle() {
+      close();
+    }
+    void close() {
+      if (handle != INVALID_HANDLE_VALUE)
+        ::CloseHandle(handle);
+    }
+    HANDLE detach() {
+      HANDLE old_handle = handle;
+      handle = INVALID_HANDLE_VALUE;
+      return old_handle;
+    }
+    operator HANDLE() const { return handle; }
+    HANDLE* operator&() { return &handle; }
+  private:
+    HANDLE handle;
+  };
+  
+  //Based on the discussion thread: https://www.reddit.com/r/cpp/comments/3vpjqg/a_new_platform_independent_process_library_for_c11/cxq1wsj
+  std::mutex create_process_mutex;
 }
 
 //Based on the example at https://msdn.microsoft.com/en-us/library/windows/desktop/ms682499(v=vs.85).aspx.
