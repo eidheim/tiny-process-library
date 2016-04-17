@@ -2,10 +2,15 @@
 #include <cstring>
 #include <TlHelp32.h>
 #include <stdexcept>
+#ifdef _UNICODE
+#include <locale>
+#include <codecvt>
+#endif
 
 Process::Data::Data(): id(0), handle(NULL) {}
 
 namespace {
+
   // Simple HANDLE wrapper to close it automatically from the destructor.
   class Handle {
   public:
@@ -30,10 +35,15 @@ namespace {
   
   //Based on the discussion thread: https://www.reddit.com/r/cpp/comments/3vpjqg/a_new_platform_independent_process_library_for_c11/cxq1wsj
   std::mutex create_process_mutex;
+
+#ifdef _UNICODE
+  // unicode converter; string to wstring
+  std::wstring widen( const std::string& s ) { return std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().from_bytes( s ); }
+#endif
 }
 
 //Based on the example at https://msdn.microsoft.com/en-us/library/windows/desktop/ms682499(v=vs.85).aspx.
-Process::id_type Process::open(const std::string &command, const std::string &path) {
+Process::id_type Process::open(const std::string &_command, const std::string &path) {
   if(open_stdin)
     stdin_fd=std::unique_ptr<fd_type>(new fd_type(NULL));
   if(read_stdout)
@@ -86,15 +96,8 @@ Process::id_type Process::open(const std::string &command, const std::string &pa
   if(stdin_fd || stdout_fd || stderr_fd)
     startup_info.dwFlags |= STARTF_USESTDHANDLES;
 
-  char* path_cstr;
-  if(path=="")
-    path_cstr=NULL;
-  else {
-    path_cstr=new char[path.size()+1];
-    std::strcpy(path_cstr, path.c_str());
-  }
+  auto command = _command;	// copy input, overwrite if msys
 
-  char* command_cstr;
 #ifdef MSYS_PROCESS_USE_SH
   size_t pos=0;
   std::string sh_command=command;
@@ -109,17 +112,27 @@ Process::id_type Process::open(const std::string &command, const std::string &pa
   }
   sh_command.insert(0, "sh -c \"");
   sh_command+="\"";
-  command_cstr=new char[sh_command.size()+1];
-  std::strcpy(command_cstr, sh_command.c_str());
-#else
-  command_cstr=new char[command.size()+1];
-  std::strcpy(command_cstr, command.c_str());
+  command = sh_command;	// overwrite
 #endif
 
-  BOOL bSuccess = CreateProcess(NULL, command_cstr, NULL, NULL, TRUE, 0,
-                                NULL, path_cstr, &startup_info, &process_info);
-  delete[] path_cstr;
-  delete[] command_cstr;
+  // platform-specific string for WinAPI
+  using tstring = std::basic_string<TCHAR>;
+
+  tstring
+	  tcommand
+	  , tpath
+	  ;
+
+#ifdef _UNICODE
+  tcommand = widen( command );
+  tpath = widen( path );
+#else
+  tcommand = command;
+  tpath = path;
+#endif
+
+  BOOL bSuccess = CreateProcess(NULL, &tcommand[0], NULL, NULL, TRUE, 0,
+                                NULL, tpath.empty() ? NULL : tpath.c_str(), &startup_info, &process_info);
 
   if(!bSuccess) {
     CloseHandle(process_info.hProcess);
