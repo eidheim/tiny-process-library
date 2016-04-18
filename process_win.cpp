@@ -33,7 +33,7 @@ namespace {
 }
 
 //Based on the example at https://msdn.microsoft.com/en-us/library/windows/desktop/ms682499(v=vs.85).aspx.
-Process::id_type Process::open(const std::string &command, const std::string &path) {
+Process::id_type Process::open(const string_type &command, const string_type &path) {
   if(open_stdin)
     stdin_fd=std::unique_ptr<fd_type>(new fd_type(NULL));
   if(read_stdout)
@@ -86,40 +86,24 @@ Process::id_type Process::open(const std::string &command, const std::string &pa
   if(stdin_fd || stdout_fd || stderr_fd)
     startup_info.dwFlags |= STARTF_USESTDHANDLES;
 
-  char* path_cstr;
-  if(path=="")
-    path_cstr=NULL;
-  else {
-    path_cstr=new char[path.size()+1];
-    std::strcpy(path_cstr, path.c_str());
-  }
-
-  char* command_cstr;
+  string_type process_command=command;
 #ifdef MSYS_PROCESS_USE_SH
   size_t pos=0;
-  std::string sh_command=command;
-  while((pos=sh_command.find('\\', pos))!=std::string::npos) {
-    sh_command.replace(pos, 1, "\\\\\\\\");
+  while((pos=process_command.find('\\', pos))!=string_type::npos) {
+    process_command.replace(pos, 1, "\\\\\\\\");
     pos+=4;
   }
   pos=0;
-  while((pos=sh_command.find('\"', pos))!=std::string::npos) {
-    sh_command.replace(pos, 1, "\\\"");
+  while((pos=process_command.find('\"', pos))!=string_type::npos) {
+    process_command.replace(pos, 1, "\\\"");
     pos+=2;
   }
-  sh_command.insert(0, "sh -c \"");
-  sh_command+="\"";
-  command_cstr=new char[sh_command.size()+1];
-  std::strcpy(command_cstr, sh_command.c_str());
-#else
-  command_cstr=new char[command.size()+1];
-  std::strcpy(command_cstr, command.c_str());
+  process_command.insert(0, "sh -c \"");
+  process_command+="\"";
 #endif
 
-  BOOL bSuccess = CreateProcess(NULL, command_cstr, NULL, NULL, TRUE, 0,
-                                NULL, path_cstr, &startup_info, &process_info);
-  delete[] path_cstr;
-  delete[] command_cstr;
+  BOOL bSuccess = CreateProcess(NULL, process_command.empty()?NULL:&process_command[0], NULL, NULL, TRUE, 0,
+                                NULL, path.empty()?NULL:path.c_str(), &startup_info, &process_info);
 
   if(!bSuccess) {
     CloseHandle(process_info.hProcess);

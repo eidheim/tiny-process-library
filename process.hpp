@@ -23,9 +23,11 @@ public:
 #ifdef _WIN32
   typedef DWORD id_type; //Process id type
   typedef HANDLE fd_type; //File descriptor type
+  typedef std::basic_string<TCHAR> string_type;
 #else
   typedef pid_t id_type;
   typedef int fd_type;
+  typedef std::string string_type;
 #endif
 private:
   class Data {
@@ -37,7 +39,7 @@ private:
 #endif
   };
 public:
-  Process(const std::string &command, const std::string &path=std::string(),
+  Process(const string_type &command, const string_type &path=string_type(),
           std::function<void(const char *bytes, size_t n)> read_stdout=nullptr,
           std::function<void(const char *bytes, size_t n)> read_stderr=nullptr,
           bool open_stdin=false,
@@ -73,7 +75,7 @@ private:
   
   std::unique_ptr<fd_type> stdout_fd, stderr_fd, stdin_fd;
   
-  id_type open(const std::string &command, const std::string &path);
+  id_type open(const string_type &command, const string_type &path);
   void async_read();
   void close_fds();
 };
