@@ -7,9 +7,7 @@
 #include <mutex>
 #include <thread>
 #include <mutex>
-#ifdef _WIN32
-#include <windows.h>
-#else
+#ifndef _WIN32
 #include <sys/wait.h>
 #endif
 
@@ -21,9 +19,13 @@
 class Process {
 public:
 #ifdef _WIN32
-  typedef DWORD id_type; //Process id type
-  typedef HANDLE fd_type; //File descriptor type
-  typedef std::basic_string<TCHAR> string_type;
+  typedef unsigned long id_type; //Process id type
+  typedef void *fd_type; //File descriptor type
+#ifdef UNICODE
+  typedef std::wstring string_type;
+#else
+  typedef std::string string_type;
+#endif
 #else
   typedef pid_t id_type;
   typedef int fd_type;
@@ -35,7 +37,7 @@ private:
     Data();
     id_type id;
 #ifdef _WIN32
-    HANDLE handle;
+    void *handle;
 #endif
   };
 public:

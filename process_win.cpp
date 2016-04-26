@@ -1,4 +1,5 @@
 #include "process.hpp"
+#include <windows.h>
 #include <cstring>
 #include <TlHelp32.h>
 #include <stdexcept>
