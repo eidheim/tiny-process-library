@@ -3,13 +3,21 @@
 
 using namespace std;
 
+#if !defined(_WIN32) || defined(MSYS_PROCESS_USE_SH)
+const string PREFIX = "";
+const string SLEEP = "sleep";
+#else
+const string PREFIX = "cmd /C ";
+const string SLEEP = "timeout";
+#endif
+
 int main() {
 #if !defined(_WIN32) || defined(MSYS_PROCESS_USE_SH)
   //The following examples are for Unix-like systems and Windows through MSYS2
 
 
   cout << "Example 1 - the mandatory Hello World" << endl;
-  Process process1("echo Hello World", "", [](const char *bytes, size_t n) {
+  Process process1(PREFIX+"echo Hello World", "", [](const char *bytes, size_t n) {
     cout << "Output from stdout: " << std::string(bytes, n);
   });
   auto exit_status=process1.get_exit_status();
@@ -18,7 +26,7 @@ int main() {
   
   
   cout << endl << "Example 2 - cd into a nonexistent directory" << endl;
-  Process process2("cd a_nonexistent_directory", "", [](const char *bytes, size_t n) {
+  Process process2(PREFIX+"cd a_nonexistent_directory", "", [](const char *bytes, size_t n) {
     cout << "Output from stdout: " << std::string(bytes, n);
   }, [](const char *bytes, size_t n) {
     cout << "Output from stderr: " << std::string(bytes, n);
@@ -33,7 +41,7 @@ int main() {
   
   cout << endl << "Example 3 - async sleep process" << endl;
   std::thread thread3([]() {
-    Process process3("sleep 5");
+    Process process3(SLEEP+" 5");
     auto exit_status=process3.get_exit_status();
     cout << "Example 3 process returned: " << exit_status << " (" << (exit_status==0?"success":"failure") << ")" << endl;
   });
@@ -42,7 +50,7 @@ int main() {
   
   
   cout << endl << "Example 4 - killing async sleep process after 5 seconds" << endl;
-  auto process4=std::make_shared<Process>("sleep 10");
+  auto process4=std::make_shared<Process>(SLEEP+" 10");
   std::thread thread4([process4]() {
     auto exit_status=process4->get_exit_status();
     cout << "Example 4 process returned: " << exit_status << " (" << (exit_status==0?"success":"failure") << ")" << endl;

@@ -21,15 +21,9 @@ public:
 #ifdef _WIN32
   typedef unsigned long id_type; //Process id type
   typedef void *fd_type; //File descriptor type
-#ifdef UNICODE
-  typedef std::wstring string_type;
-#else
-  typedef std::string string_type;
-#endif
 #else
   typedef pid_t id_type;
   typedef int fd_type;
-  typedef std::string string_type;
 #endif
 private:
   class Data {
@@ -41,7 +35,7 @@ private:
 #endif
   };
 public:
-  Process(const string_type &command, const string_type &path=string_type(),
+  Process(const std::string &command, const std::string &path="",
           std::function<void(const char *bytes, size_t n)> read_stdout=nullptr,
           std::function<void(const char *bytes, size_t n)> read_stderr=nullptr,
           bool open_stdin=false,
@@ -77,7 +71,7 @@ private:
   
   std::unique_ptr<fd_type> stdout_fd, stderr_fd, stdin_fd;
   
-  id_type open(const string_type &command, const string_type &path);
+  id_type open(const std::string &command, const std::string &path);
   void async_read();
   void close_fds();
 };

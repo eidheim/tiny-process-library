@@ -34,7 +34,7 @@ namespace {
 }
 
 //Based on the example at https://msdn.microsoft.com/en-us/library/windows/desktop/ms682499(v=vs.85).aspx.
-Process::id_type Process::open(const string_type &command, const string_type &path) {
+Process::id_type Process::open(const std::string &command, const std::string &path) {
   if(open_stdin)
     stdin_fd=std::unique_ptr<fd_type>(new fd_type(NULL));
   if(read_stdout)
@@ -75,27 +75,27 @@ Process::id_type Process::open(const string_type &command, const string_type &pa
   }
 
   PROCESS_INFORMATION process_info;
-  STARTUPINFO startup_info;
+  STARTUPINFOA startup_info;
 
   ZeroMemory(&process_info, sizeof(PROCESS_INFORMATION));
 
-  ZeroMemory(&startup_info, sizeof(STARTUPINFO));
-  startup_info.cb = sizeof(STARTUPINFO);
+  ZeroMemory(&startup_info, sizeof(STARTUPINFOA));
+  startup_info.cb = sizeof(STARTUPINFOA);
   startup_info.hStdInput = stdin_rd_p;
   startup_info.hStdOutput = stdout_wr_p;
   startup_info.hStdError = stderr_wr_p;
   if(stdin_fd || stdout_fd || stderr_fd)
     startup_info.dwFlags |= STARTF_USESTDHANDLES;
 
-  string_type process_command=command;
+  std::string process_command=command;
 #ifdef MSYS_PROCESS_USE_SH
   size_t pos=0;
-  while((pos=process_command.find('\\', pos))!=string_type::npos) {
+  while((pos=process_command.find('\\', pos))!= std::string::npos) {
     process_command.replace(pos, 1, "\\\\\\\\");
     pos+=4;
   }
   pos=0;
-  while((pos=process_command.find('\"', pos))!=string_type::npos) {
+  while((pos=process_command.find('\"', pos))!= std::string::npos) {
     process_command.replace(pos, 1, "\\\"");
     pos+=2;
   }
@@ -103,7 +103,7 @@ Process::id_type Process::open(const string_type &command, const string_type &pa
   process_command+="\"";
 #endif
 
-  BOOL bSuccess = CreateProcess(NULL, process_command.empty()?NULL:&process_command[0], NULL, NULL, TRUE, 0,
+  BOOL bSuccess = CreateProcessA(NULL, process_command.empty()?NULL:&process_command[0], NULL, NULL, TRUE, 0,
                                 NULL, path.empty()?NULL:path.c_str(), &startup_info, &process_info);
 
   if(!bSuccess) {

@@ -1,6 +1,6 @@
 #include "process.hpp"
 
-Process::Process(const string_type &command, const string_type &path,
+Process::Process(const std::string &command, const std::string &path,
                  std::function<void(const char* bytes, size_t n)> read_stdout,
                  std::function<void(const char* bytes, size_t n)> read_stderr,
                  bool open_stdin, size_t buffer_size):
