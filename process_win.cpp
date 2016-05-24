@@ -227,11 +227,15 @@ void Process::kill(bool force) {
       if(Process32First(snapshot, &process)) {
         do {
           if(process.th32ParentProcessID==data.id) {
-            HANDLE process_handle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, process.th32ProcessID);
-            if(process_handle) TerminateProcess(process_handle, 2);
+            HANDLE process_handle = OpenProcess(PROCESS_TERMINATE, FALSE, process.th32ProcessID);
+            if(process_handle) {
+              TerminateProcess(process_handle, 2);
+              CloseHandle(process_handle);
+            }
           }
         } while (Process32Next(snapshot, &process));
       }
+      CloseHandle(snapshot);
     }
     TerminateProcess(data.handle, 2);
   }
@@ -249,12 +253,16 @@ void Process::kill(id_type id, bool force) {
     if(Process32First(snapshot, &process)) {
       do {
         if(process.th32ParentProcessID==id) {
-          HANDLE process_handle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, process.th32ProcessID);
-          if(process_handle) TerminateProcess(process_handle, 2);
+          HANDLE process_handle = OpenProcess(PROCESS_TERMINATE, FALSE, process.th32ProcessID);
+          if(process_handle) {
+            TerminateProcess(process_handle, 2);
+            CloseHandle(process_handle);
+          }
         }
       } while (Process32Next(snapshot, &process));
     }
+    CloseHandle(snapshot);
   }
-  HANDLE process_handle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, id);
+  HANDLE process_handle = OpenProcess(PROCESS_TERMINATE, FALSE, id);
   if(process_handle) TerminateProcess(process_handle, 2);
 }
