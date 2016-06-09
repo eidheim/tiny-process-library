@@ -6,7 +6,6 @@
 #include <vector>
 #include <mutex>
 #include <thread>
-#include <mutex>
 #include <memory>
 #ifndef _WIN32
 #include <sys/wait.h>
