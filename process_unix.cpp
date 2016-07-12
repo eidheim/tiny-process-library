@@ -8,11 +8,11 @@ Process::Data::Data(): id(-1) {}
 
 Process::id_type Process::open(const std::string &command, const std::string &path) {
   if(open_stdin)
-    stdin_fd=std::unique_ptr<fd_type>(new fd_type);
+    stdin_fd=std::make_unique<fd_type>();
   if(read_stdout)
-    stdout_fd=std::unique_ptr<fd_type>(new fd_type);
+    stdout_fd=std::make_unique<fd_type>();
   if(read_stderr)
-    stderr_fd=std::unique_ptr<fd_type>(new fd_type);
+    stderr_fd=std::make_unique<fd_type>();
   
   int stdin_p[2], stdout_p[2], stderr_p[2];
 
