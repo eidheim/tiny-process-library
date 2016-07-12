@@ -36,11 +36,11 @@ namespace {
 //Based on the example at https://msdn.microsoft.com/en-us/library/windows/desktop/ms682499(v=vs.85).aspx.
 Process::id_type Process::open(const string_type &command, const string_type &path) {
   if(open_stdin)
-    stdin_fd=std::make_unique<fd_type>(NULL);
+    stdin_fd=std::unique_ptr<fd_type>(new fd_type(NULL));
   if(read_stdout)
-    stdout_fd=std::make_unique<fd_type>(NULL);
+    stdout_fd=std::unique_ptr<fd_type>(new fd_type(NULL));
   if(read_stderr)
-    stderr_fd=std::make_unique<fd_type>(NULL);
+    stderr_fd=std::unique_ptr<fd_type>(new fd_type(NULL));
 
   Handle stdin_rd_p;
   Handle stdin_wr_p;
@@ -131,7 +131,7 @@ void Process::async_read() {
   if(stdout_fd) {
     stdout_thread=std::thread([this](){
       DWORD n;
-      auto buffer = std::make_unique<char[]>(buffer_size);
+      std::unique_ptr<char[]> buffer(new char[buffer_size]);
       for (;;) {
         BOOL bSuccess = ReadFile(*stdout_fd, static_cast<CHAR*>(buffer.get()), static_cast<DWORD>(buffer_size), &n, nullptr);
         if(!bSuccess || n == 0)
@@ -143,7 +143,7 @@ void Process::async_read() {
   if(stderr_fd) {
     stderr_thread=std::thread([this](){
       DWORD n;
-      auto buffer = std::make_unique<char[]>(buffer_size);
+      std::unique_ptr<char[]> buffer(new char[buffer_size]);
       for (;;) {
         BOOL bSuccess = ReadFile(*stderr_fd, static_cast<CHAR*>(buffer.get()), static_cast<DWORD>(buffer_size), &n, nullptr);
         if(!bSuccess || n == 0)
