@@ -91,7 +91,7 @@ void Process::async_read() {
     return;
   if(stdout_fd) {
     stdout_thread=std::thread([this](){
-      auto buffer = std::make_unique<char[]>(buffer_size);
+      auto buffer = std::unique_ptr<char[]>( new char[buffer_size] );
       ssize_t n;
       while ((n=read(*stdout_fd, buffer.get(), buffer_size)) > 0)
         read_stdout(buffer.get(), static_cast<size_t>(n));
@@ -99,7 +99,7 @@ void Process::async_read() {
   }
   if(stderr_fd) {
     stderr_thread=std::thread([this](){
-      auto buffer = std::make_unique<char[]>(buffer_size);
+      auto buffer = std::unique_ptr<char[]>( new char[buffer_size] );
       ssize_t n;
       while ((n=read(*stderr_fd, buffer.get(), buffer_size)) > 0)
         read_stderr(buffer.get(), static_cast<size_t>(n));
