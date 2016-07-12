@@ -53,7 +53,7 @@ Process::id_type Process::open(const string_type &command, const string_type &pa
 
   security_attributes.nLength = sizeof(SECURITY_ATTRIBUTES);
   security_attributes.bInheritHandle = TRUE;
-  security_attributes.lpSecurityDescriptor = NULL;
+  security_attributes.lpSecurityDescriptor = nullptr;
 
   std::lock_guard<std::mutex> lock(create_process_mutex);
   if(stdin_fd) {
@@ -103,8 +103,8 @@ Process::id_type Process::open(const string_type &command, const string_type &pa
   process_command+="\"";
 #endif
 
-  BOOL bSuccess = CreateProcess(NULL, process_command.empty()?NULL:&process_command[0], NULL, NULL, TRUE, 0,
-                                NULL, path.empty()?NULL:path.c_str(), &startup_info, &process_info);
+  BOOL bSuccess = CreateProcess(nullptr, process_command.empty()?nullptr:&process_command[0], nullptr, nullptr, TRUE, 0,
+                                nullptr, path.empty()?nullptr:path.c_str(), &startup_info, &process_info);
 
   if(!bSuccess) {
     CloseHandle(process_info.hProcess);
@@ -133,7 +133,7 @@ void Process::async_read() {
       DWORD n;
       auto buffer = std::make_unique<char[]>(buffer_size);
       for (;;) {
-        BOOL bSuccess = ReadFile(*stdout_fd, static_cast<CHAR*>(buffer.get()), static_cast<DWORD>(buffer_size), &n, NULL);
+        BOOL bSuccess = ReadFile(*stdout_fd, static_cast<CHAR*>(buffer.get()), static_cast<DWORD>(buffer_size), &n, nullptr);
         if(!bSuccess || n == 0)
           break;
         read_stdout(buffer.get(), static_cast<size_t>(n));
@@ -145,7 +145,7 @@ void Process::async_read() {
       DWORD n;
       auto buffer = std::make_unique<char[]>(buffer_size);
       for (;;) {
-        BOOL bSuccess = ReadFile(*stderr_fd, static_cast<CHAR*>(buffer.get()), static_cast<DWORD>(buffer_size), &n, NULL);
+        BOOL bSuccess = ReadFile(*stderr_fd, static_cast<CHAR*>(buffer.get()), static_cast<DWORD>(buffer_size), &n, nullptr);
         if(!bSuccess || n == 0)
           break;
         read_stderr(buffer.get(), static_cast<size_t>(n));
@@ -196,7 +196,7 @@ bool Process::write(const char *bytes, size_t n) {
   std::lock_guard<std::mutex> lock(stdin_mutex);
   if(stdin_fd) {
     DWORD written;
-    BOOL bSuccess=WriteFile(*stdin_fd, bytes, static_cast<DWORD>(n), &written, NULL);
+    BOOL bSuccess=WriteFile(*stdin_fd, bytes, static_cast<DWORD>(n), &written, nullptr);
     if(!bSuccess || written==0) {
       return false;
     }
