@@ -1,4 +1,4 @@
-# tiny-process-library
+# tiny-process-library [![Build Status](https://travis-ci.org/cppit/jucipp.svg?branch=master)](https://travis-ci.org/eidheim/tiny-process-library)
 A small platform independent library making it simple to create and stop new processes in C++, as well as writing to stdin and reading from stdout and stderr of a new process.
 
 This library was created for, and is used by the C++ IDE project [juCi++](https://github.com/cppit/jucipp).
