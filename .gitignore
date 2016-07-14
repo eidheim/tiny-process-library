@@ -41,3 +41,4 @@ compile_commands.json
 examples
 open_close_test
 multithread_test
+io_test

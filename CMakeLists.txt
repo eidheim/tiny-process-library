@@ -31,5 +31,5 @@ target_link_libraries(examples tiny-process-library)
 # To enable tests: cmake -DENABLE_TESTING=1 .
 if(ENABLE_TESTING)
   enable_testing()
-  add_subdirectory(test)
+  add_subdirectory(tests)
 endif()
