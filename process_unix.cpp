@@ -118,7 +118,7 @@ int Process::get_exit_status() {
   }
   close_fds();
 
-  return exit_status;
+  return exit_status>>8;
 }
 
 void Process::close_fds() {
