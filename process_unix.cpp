@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <stdexcept>
+#include <cstring>
 
 Process::Data::Data(): id(-1) {}
 
