@@ -21,7 +21,9 @@ See [examples.cpp](https://github.com/eidheim/tiny-process-library/blob/master/e
 ```sh
 git clone http://github.com/eidheim/tiny-process-library
 cd tiny-process-library
-cmake .
+mkdir build
+cd build
+cmake ..
 make
 ./examples
 ```
@@ -30,7 +32,9 @@ make
 ```sh
 git clone http://github.com/eidheim/tiny-process-library
 cd tiny-process-library
-cmake -G"MSYS Makefiles" .
+mkdir build
+cd build
+cmake -G"MSYS Makefiles" ..
 make
 ./examples
 ```
