@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <stdexcept>
+#include <cstring>
 
 Process::Data::Data(): id(-1) {}
 
@@ -15,6 +16,9 @@ Process::id_type Process::open(const std::string &command, const std::string &pa
     stderr_fd=std::unique_ptr<fd_type>(new fd_type);
   
   int stdin_p[2], stdout_p[2], stderr_p[2];
+  std::memset(stdin_p, 0, sizeof(stdin_p));
+  std::memset(stdout_p, 0, sizeof(stdout_p));
+  std::memset(stderr_p, 0, sizeof(stderr_p));
 
   if(stdin_fd && pipe(stdin_p)!=0)
     return -1;
