@@ -6,7 +6,16 @@
 
 Process::Data::Data(): id(-1) {}
 
-Process::id_type Process::open(const std::string &command, const std::string &path) {
+Process::Process(std::function<void()> function, const string_type &path,
+                 std::function<void (const char *, size_t)> read_stdout,
+                 std::function<void (const char *, size_t)> read_stderr,
+                 bool open_stdin, size_t buffer_size) :
+                 closed(true), read_stdout(read_stdout), read_stderr(read_stderr), open_stdin(open_stdin), buffer_size(buffer_size) {
+  open(function);
+  async_read();
+}
+
+Process::id_type Process::open(std::function<void()> function) {
   if(open_stdin)
     stdin_fd=std::unique_ptr<fd_type>(new fd_type);
   if(read_stdout)
@@ -15,7 +24,7 @@ Process::id_type Process::open(const std::string &command, const std::string &pa
     stderr_fd=std::unique_ptr<fd_type>(new fd_type);
   
   int stdin_p[2], stdout_p[2], stderr_p[2];
-
+  
   if(stdin_fd && pipe(stdin_p)!=0)
     return -1;
   if(stdout_fd && pipe(stdout_p)!=0) {
@@ -29,7 +38,7 @@ Process::id_type Process::open(const std::string &command, const std::string &pa
   }
   
   id_type pid = fork();
-
+  
   if (pid < 0) {
     if(stdin_fd) {close(stdin_p[0]);close(stdin_p[1]);}
     if(stdout_fd) {close(stdout_p[0]);close(stdout_p[1]);}
@@ -43,16 +52,37 @@ Process::id_type Process::open(const std::string &command, const std::string &pa
     if(stdin_fd) {close(stdin_p[0]);close(stdin_p[1]);}
     if(stdout_fd) {close(stdout_p[0]);close(stdout_p[1]);}
     if(stderr_fd) {close(stderr_p[0]);close(stderr_p[1]);}
-
+  
     //Based on http://stackoverflow.com/a/899533/3808293
     int fd_max=sysconf(_SC_OPEN_MAX);
     for(int fd=3;fd<fd_max;fd++)
       close(fd);
-
+  
     setpgid(0, 0);
     //TODO: See here on how to emulate tty for colors: http://stackoverflow.com/questions/1401002/trick-an-application-into-thinking-its-stdin-is-interactive-not-a-pipe
     //TODO: One solution is: echo "command;exit"|script -q /dev/null
     
+    if(function)
+      function();
+    
+    _exit(EXIT_FAILURE);
+  }
+  
+  if(stdin_fd) close(stdin_p[0]);
+  if(stdout_fd) close(stdout_p[1]);
+  if(stderr_fd) close(stderr_p[1]);
+  
+  if(stdin_fd) *stdin_fd = stdin_p[1];
+  if(stdout_fd) *stdout_fd = stdout_p[0];
+  if(stderr_fd) *stderr_fd = stderr_p[0];
+  
+  closed=false;
+  data.id=pid;
+  return pid;
+}
+
+Process::id_type Process::open(const std::string &command, const std::string &path) {
+  return open([&command, &path] {
     if(!path.empty()) {
       auto path_escaped=path;
       size_t pos=0;
@@ -65,21 +95,7 @@ Process::id_type Process::open(const std::string &command, const std::string &pa
     }
     else
       execl("/bin/sh", "sh", "-c", command.c_str(), NULL);
-    
-    _exit(EXIT_FAILURE);
-  }
-
-  if(stdin_fd) close(stdin_p[0]);
-  if(stdout_fd) close(stdout_p[1]);
-  if(stderr_fd) close(stderr_p[1]);
-  
-  if(stdin_fd) *stdin_fd = stdin_p[1];
-  if(stdout_fd) *stdout_fd = stdout_p[0];
-  if(stderr_fd) *stderr_fd = stderr_p[0];
-
-  closed=false;
-  data.id=pid;
-  return pid;
+  });
 }
 
 void Process::async_read() {

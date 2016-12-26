@@ -8,13 +8,27 @@ int main() {
   //The following examples are for Unix-like systems and Windows through MSYS2
 
 
-  cout << "Example 1 - the mandatory Hello World" << endl;
-  Process process1("echo Hello World", "", [](const char *bytes, size_t n) {
+  cout << "Example 1a - the mandatory Hello World through an executable" << endl;
+  Process process1a("echo Hello World", "", [](const char *bytes, size_t n) {
     cout << "Output from stdout: " << string(bytes, n);
   });
-  auto exit_status=process1.get_exit_status();
-  cout << "Example 1 process returned: " << exit_status << " (" << (exit_status==0?"success":"failure") << ")" << endl;
+  auto exit_status=process1a.get_exit_status();
+  cout << "Example 1a process returned: " << exit_status << " (" << (exit_status==0?"success":"failure") << ")" << endl;
   this_thread::sleep_for(chrono::seconds(5));
+  
+  
+#ifndef _WIN32
+  cout << endl << "Example 1b - Hello World through a function on Unix-like systems" << endl;
+  Process process1b([] {
+    cout << "Hello World" << endl;
+    exit(0);
+  }, "", [](const char *bytes, size_t n) {
+    cout << "Output from stdout: " << string(bytes, n);
+  });
+  exit_status=process1b.get_exit_status();
+  cout << "Example 1b process returned: " << exit_status << " (" << (exit_status==0?"success":"failure") << ")" << endl;
+  this_thread::sleep_for(chrono::seconds(5));
+#endif
   
   
   cout << endl << "Example 2 - cd into a nonexistent directory" << endl;

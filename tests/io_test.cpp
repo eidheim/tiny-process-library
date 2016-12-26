@@ -1,5 +1,6 @@
 #include "process.hpp"
 #include <cassert>
+#include <iostream>
 
 int main() {
   auto output=std::make_shared<std::string>();
@@ -12,6 +13,20 @@ int main() {
     assert(output->substr(0, 4)=="Test");
     output->clear();
   }
+  
+#ifndef _WIN32
+  {
+    Process process([] {
+      std::cout << "Test" << std::endl;
+      exit(0);
+    }, "", [output](const char *bytes, size_t n) {
+      *output+=std::string(bytes, n);
+    });
+    assert(process.get_exit_status()==0);
+    assert(output->substr(0, 4)=="Test");
+    output->clear();
+  }
+#endif
   
   {
     Process process("echo Test && ls an_incorrect_path", "", [output](const char *bytes, size_t n) {

@@ -11,11 +11,7 @@
 #include <sys/wait.h>
 #endif
 
-///Create a new process given command and run path.
-///TODO: on Windows it is harder to specify which pipes to redirect.
-///Thus, at the moment, if read_stdout==nullptr, read_stderr==nullptr and open_stdin==false,
-///the stdout, stderr and stdin are sent to the parent process instead.
-///Compile with -DMSYS_PROCESS_USE_SH to run command using "sh -c [command]" on Windows as well.
+///Platform independent class for creating processes
 class Process {
 public:
 #ifdef _WIN32
@@ -41,11 +37,22 @@ private:
 #endif
   };
 public:
+  ///Note on Windows: it seems not possible to specify which pipes to redirect.
+  ///Thus, at the moment, if read_stdout==nullptr, read_stderr==nullptr and open_stdin==false,
+  ///the stdout, stderr and stdin are sent to the parent process instead.
   Process(const string_type &command, const string_type &path=string_type(),
           std::function<void(const char *bytes, size_t n)> read_stdout=nullptr,
           std::function<void(const char *bytes, size_t n)> read_stderr=nullptr,
           bool open_stdin=false,
           size_t buffer_size=131072);
+#ifndef _WIN32
+  /// Supported on Unix-like systems only.
+  Process(std::function<void()> function, const string_type &path=string_type(),
+          std::function<void(const char *bytes, size_t n)> read_stdout=nullptr,
+          std::function<void(const char *bytes, size_t n)> read_stderr=nullptr,
+          bool open_stdin=false,
+          size_t buffer_size=131072);
+#endif
   ~Process();
   
   ///Get the process id of the started process.
@@ -59,9 +66,9 @@ public:
   ///Close stdin. If the process takes parameters from stdin, use this to notify that all parameters have been sent.
   void close_stdin();
   
-  ///Kill the process.
+  ///Kill the process. force=true is only supported on Unix-like systems.
   void kill(bool force=false);
-  ///Kill a given process id. Use kill(bool force) instead if possible.
+  ///Kill a given process id. Use kill(bool force) instead if possible. force=true is only supported on Unix-like systems.
   static void kill(id_type id, bool force=false);
   
 private:
@@ -78,6 +85,9 @@ private:
   std::unique_ptr<fd_type> stdout_fd, stderr_fd, stdin_fd;
   
   id_type open(const string_type &command, const string_type &path);
+#ifndef _WIN32
+  id_type open(std::function<void()> function);
+#endif
   void async_read();
   void close_fds();
 };
