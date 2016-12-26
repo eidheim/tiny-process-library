@@ -19,7 +19,7 @@ int main() {
     Process process([] {
       std::cout << "Test" << std::endl;
       exit(0);
-    }, "", [output](const char *bytes, size_t n) {
+    }, [output](const char *bytes, size_t n) {
       *output+=std::string(bytes, n);
     });
     assert(process.get_exit_status()==0);

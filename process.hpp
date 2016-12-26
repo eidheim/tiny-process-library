@@ -47,7 +47,7 @@ public:
           size_t buffer_size=131072);
 #ifndef _WIN32
   /// Supported on Unix-like systems only.
-  Process(std::function<void()> function, const string_type &path=string_type(),
+  Process(std::function<void()> function,
           std::function<void(const char *bytes, size_t n)> read_stdout=nullptr,
           std::function<void(const char *bytes, size_t n)> read_stderr=nullptr,
           bool open_stdin=false,

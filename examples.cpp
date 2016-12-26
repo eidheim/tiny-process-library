@@ -22,7 +22,7 @@ int main() {
   Process process1b([] {
     cout << "Hello World" << endl;
     exit(0);
-  }, "", [](const char *bytes, size_t n) {
+  }, [](const char *bytes, size_t n) {
     cout << "Output from stdout: " << string(bytes, n);
   });
   exit_status=process1b.get_exit_status();

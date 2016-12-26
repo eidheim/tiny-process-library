@@ -6,7 +6,7 @@
 
 Process::Data::Data(): id(-1) {}
 
-Process::Process(std::function<void()> function, const string_type &path,
+Process::Process(std::function<void()> function,
                  std::function<void (const char *, size_t)> read_stdout,
                  std::function<void (const char *, size_t)> read_stderr,
                  bool open_stdin, size_t buffer_size) :
