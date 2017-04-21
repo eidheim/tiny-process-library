@@ -54,7 +54,7 @@ Process::id_type Process::open(std::function<void()> function) {
     if(stderr_fd) {close(stderr_p[0]);close(stderr_p[1]);}
   
     //Based on http://stackoverflow.com/a/899533/3808293
-    int fd_max=sysconf(_SC_OPEN_MAX);
+    int fd_max=static_cast<int>(sysconf(_SC_OPEN_MAX)); // truncation is safe
     for(int fd=3;fd<fd_max;fd++)
       close(fd);
   
