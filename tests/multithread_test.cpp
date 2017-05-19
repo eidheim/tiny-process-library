@@ -4,6 +4,7 @@
 #include <atomic>
 
 using namespace std;
+using namespace TinyProcessLib;
 
 int main() {
   atomic<bool> stdout_error(false);
@@ -12,8 +13,8 @@ int main() {
   for(size_t ct=0;ct<4;ct++) {
     threads.emplace_back([&stdout_error, &exit_status_error, ct]() {
       for(size_t c=0;c<2500;c++) {
-        Process process("echo Hello World "+std::to_string(c)+" "+std::to_string(ct), "", [&stdout_error, ct, c](const char *bytes, size_t n) {
-          if(std::string(bytes, n)!="Hello World "+std::to_string(c)+" "+std::to_string(ct)+"\n")
+        Process process("echo Hello World "+to_string(c)+" "+to_string(ct), "", [&stdout_error, ct, c](const char *bytes, size_t n) {
+          if(string(bytes, n)!="Hello World "+to_string(c)+" "+to_string(ct)+"\n")
             stdout_error=true;
         }, [](const char *bytes, size_t n) {
         }, true);

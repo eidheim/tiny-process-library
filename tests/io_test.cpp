@@ -2,12 +2,15 @@
 #include <cassert>
 #include <iostream>
 
+using namespace std;
+using namespace TinyProcessLib;
+
 int main() {
-  auto output=std::make_shared<std::string>();
-  auto error=std::make_shared<std::string>();
+  auto output=make_shared<string>();
+  auto error=make_shared<string>();
   {
     Process process("echo Test", "", [output](const char *bytes, size_t n) {
-      *output+=std::string(bytes, n);
+      *output+=string(bytes, n);
     });
     assert(process.get_exit_status()==0);
     assert(output->substr(0, 4)=="Test");
@@ -17,10 +20,10 @@ int main() {
 #ifndef _WIN32
   {
     Process process([] {
-      std::cout << "Test" << std::endl;
+      cout << "Test" << endl;
       exit(0);
     }, [output](const char *bytes, size_t n) {
-      *output+=std::string(bytes, n);
+      *output+=string(bytes, n);
     });
     assert(process.get_exit_status()==0);
     assert(output->substr(0, 4)=="Test");
@@ -30,9 +33,9 @@ int main() {
   
   {
     Process process("echo Test && ls an_incorrect_path", "", [output](const char *bytes, size_t n) {
-      *output+=std::string(bytes, n);
+      *output+=string(bytes, n);
     }, [error](const char *bytes, size_t n) {
-      *error+=std::string(bytes, n);
+      *error+=string(bytes, n);
     });
     assert(process.get_exit_status()>0);
     assert(output->substr(0, 4)=="Test");
@@ -43,7 +46,7 @@ int main() {
   
   {
     Process process("bash", "", [output](const char *bytes, size_t n) {
-      *output+=std::string(bytes, n);
+      *output+=string(bytes, n);
     }, nullptr, true);
     process.write("echo Test\n");
     process.write("exit\n");
@@ -54,7 +57,7 @@ int main() {
   
   {
     Process process("cat", "", [output](const char *bytes, size_t n) {
-      *output+=std::string(bytes, n);
+      *output+=string(bytes, n);
     }, nullptr, true);
     process.write("Test\n");
     process.close_stdin();

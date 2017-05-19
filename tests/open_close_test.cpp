@@ -2,12 +2,13 @@
 #include <iostream>
 
 using namespace std;
+using namespace TinyProcessLib;
 
 int main() {
   bool stdout_error=false;
   for(size_t c=0;c<10000;c++) {
-    Process process("echo Hello World "+std::to_string(c), "", [&stdout_error, c](const char *bytes, size_t n) {
-      if(std::string(bytes, n)!="Hello World "+std::to_string(c)+"\n")
+    Process process("echo Hello World "+to_string(c), "", [&stdout_error, c](const char *bytes, size_t n) {
+      if(string(bytes, n)!="Hello World "+to_string(c)+"\n")
         stdout_error=true;
     }, [](const char *bytes, size_t n) {
     }, true);

@@ -1,5 +1,7 @@
 #include "process.hpp"
 
+namespace TinyProcessLib {
+
 Process::Process(const string_type &command, const string_type &path,
                  std::function<void(const char* bytes, size_t n)> read_stdout,
                  std::function<void(const char* bytes, size_t n)> read_stderr,
@@ -20,3 +22,5 @@ Process::id_type Process::get_id() {
 bool Process::write(const std::string &data) {
   return write(data.c_str(), data.size());
 }
+
+} // TinyProsessLib

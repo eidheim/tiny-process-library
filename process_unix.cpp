@@ -4,6 +4,8 @@
 #include <signal.h>
 #include <stdexcept>
 
+namespace TinyProcessLib {
+
 Process::Data::Data(): id(-1) {}
 
 Process::Process(std::function<void()> function,
@@ -198,3 +200,5 @@ void Process::kill(id_type id, bool force) {
   else
     ::kill(-id, SIGINT);
 }
+
+} // TinyProsessLib

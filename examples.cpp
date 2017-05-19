@@ -2,6 +2,7 @@
 #include <iostream>
 
 using namespace std;
+using namespace TinyProcessLib;
 
 int main() {
 #if !defined(_WIN32) || defined(MSYS_PROCESS_USE_SH)
