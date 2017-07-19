@@ -16,7 +16,7 @@ int main() {
         Process process("echo Hello World "+to_string(c)+" "+to_string(ct), "", [&stdout_error, ct, c](const char *bytes, size_t n) {
           if(string(bytes, n)!="Hello World "+to_string(c)+" "+to_string(ct)+"\n")
             stdout_error=true;
-        }, [](const char *bytes, size_t n) {
+        }, [](const char *, size_t) {
         }, true);
         auto exit_status=process.get_exit_status();
         if(exit_status!=0)

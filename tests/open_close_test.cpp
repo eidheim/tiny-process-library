@@ -10,7 +10,7 @@ int main() {
     Process process("echo Hello World "+to_string(c), "", [&stdout_error, c](const char *bytes, size_t n) {
       if(string(bytes, n)!="Hello World "+to_string(c)+"\n")
         stdout_error=true;
-    }, [](const char *bytes, size_t n) {
+    }, [](const char *, size_t) {
     }, true);
     auto exit_status=process.get_exit_status();
     if(exit_status!=0) {
