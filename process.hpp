@@ -32,7 +32,7 @@ public:
 private:
   class Data {
   public:
-    Data();
+    Data() noexcept ;
     id_type id;
 #ifdef _WIN32
     void *handle;
@@ -46,32 +46,32 @@ public:
           std::function<void(const char *bytes, size_t n)> read_stdout=nullptr,
           std::function<void(const char *bytes, size_t n)> read_stderr=nullptr,
           bool open_stdin=false,
-          size_t buffer_size=131072);
+          size_t buffer_size=131072) noexcept;
 #ifndef _WIN32
   /// Supported on Unix-like systems only.
   Process(std::function<void()> function,
           std::function<void(const char *bytes, size_t n)> read_stdout=nullptr,
           std::function<void(const char *bytes, size_t n)> read_stderr=nullptr,
           bool open_stdin=false,
-          size_t buffer_size=131072);
+          size_t buffer_size=131072) noexcept;
 #endif
-  ~Process();
+  ~Process() noexcept;
   
   ///Get the process id of the started process.
-  id_type get_id();
+  id_type get_id() const noexcept;
   ///Wait until process is finished, and return exit status.
-  int get_exit_status();
+  int get_exit_status() noexcept;
   ///Write to stdin.
   bool write(const char *bytes, size_t n);
   ///Write to stdin. Convenience function using write(const char *, size_t).
   bool write(const std::string &data);
   ///Close stdin. If the process takes parameters from stdin, use this to notify that all parameters have been sent.
-  void close_stdin();
+  void close_stdin() noexcept;
   
   ///Kill the process. force=true is only supported on Unix-like systems.
-  void kill(bool force=false);
+  void kill(bool force=false) noexcept;
   ///Kill a given process id. Use kill(bool force) instead if possible. force=true is only supported on Unix-like systems.
-  static void kill(id_type id, bool force=false);
+  static void kill(id_type id, bool force=false) noexcept;
   
 private:
   Data data;
@@ -86,12 +86,12 @@ private:
   
   std::unique_ptr<fd_type> stdout_fd, stderr_fd, stdin_fd;
   
-  id_type open(const string_type &command, const string_type &path);
+  id_type open(const string_type &command, const string_type &path) noexcept;
 #ifndef _WIN32
-  id_type open(std::function<void()> function);
+  id_type open(std::function<void()> function) noexcept;
 #endif
-  void async_read();
-  void close_fds();
+  void async_read() noexcept;
+  void close_fds() noexcept;
 };
 
 } // TinyProsessLib

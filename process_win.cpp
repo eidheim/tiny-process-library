@@ -6,26 +6,26 @@
 
 namespace TinyProcessLib {
 
-Process::Data::Data(): id(0), handle(NULL) {}
+Process::Data::Data() noexcept : id(0), handle(NULL) {}
 
 // Simple HANDLE wrapper to close it automatically from the destructor.
 class Handle {
 public:
-  Handle() : handle(INVALID_HANDLE_VALUE) { }
-  ~Handle() {
+  Handle() : handle(INVALID_HANDLE_VALUE) noexcept { }
+  ~Handle() noexcept {
     close();
   }
-  void close() {
+  void close() noexcept {
     if (handle != INVALID_HANDLE_VALUE)
       CloseHandle(handle);
   }
-  HANDLE detach() {
+  HANDLE detach() noexcept {
     HANDLE old_handle = handle;
     handle = INVALID_HANDLE_VALUE;
     return old_handle;
   }
-  operator HANDLE() const { return handle; }
-  HANDLE* operator&() { return &handle; }
+  operator HANDLE() const noexcept { return handle; }
+  HANDLE* operator&() noexcept { return &handle; }
 private:
   HANDLE handle;
 };
@@ -34,7 +34,7 @@ private:
 std::mutex create_process_mutex;
 
 //Based on the example at https://msdn.microsoft.com/en-us/library/windows/desktop/ms682499(v=vs.85).aspx.
-Process::id_type Process::open(const string_type &command, const string_type &path) {
+Process::id_type Process::open(const string_type &command, const string_type &path) noexcept {
   if(open_stdin)
     stdin_fd=std::unique_ptr<fd_type>(new fd_type(NULL));
   if(read_stdout)
@@ -125,7 +125,7 @@ Process::id_type Process::open(const string_type &command, const string_type &pa
   return process_info.dwProcessId;
 }
 
-void Process::async_read() {
+void Process::async_read() noexcept {
   if(data.id==0)
     return;
   if(stdout_fd) {
@@ -154,7 +154,7 @@ void Process::async_read() {
   }
 }
 
-int Process::get_exit_status() {
+int Process::get_exit_status() noexcept {
   if(data.id==0)
     return -1;
   DWORD exit_status;
@@ -171,7 +171,7 @@ int Process::get_exit_status() {
   return static_cast<int>(exit_status);
 }
 
-void Process::close_fds() {
+void Process::close_fds() noexcept {
   if(stdout_thread.joinable())
     stdout_thread.join();
   if(stderr_thread.joinable())
@@ -207,7 +207,7 @@ bool Process::write(const char *bytes, size_t n) {
   return false;
 }
 
-void Process::close_stdin() {
+void Process::close_stdin() noexcept {
   std::lock_guard<std::mutex> lock(stdin_mutex);
   if(stdin_fd) {
     if(*stdin_fd!=NULL) CloseHandle(*stdin_fd);
@@ -216,7 +216,7 @@ void Process::close_stdin() {
 }
 
 //Based on http://stackoverflow.com/a/1173396
-void Process::kill(bool force) {
+void Process::kill(bool force) noexcept {
   std::lock_guard<std::mutex> lock(close_mutex);
   if(data.id>0 && !closed) {
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -242,7 +242,7 @@ void Process::kill(bool force) {
 }
 
 //Based on http://stackoverflow.com/a/1173396
-void Process::kill(id_type id, bool force) {
+void Process::kill(id_type id, bool force) noexcept {
   if(id==0)
     return;
   HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);

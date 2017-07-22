@@ -6,18 +6,18 @@
 
 namespace TinyProcessLib {
 
-Process::Data::Data(): id(-1) {}
+Process::Data::Data() noexcept : id(-1) {}
 
 Process::Process(std::function<void()> function,
                  std::function<void (const char *, size_t)> read_stdout,
                  std::function<void (const char *, size_t)> read_stderr,
-                 bool open_stdin, size_t buffer_size) :
+                 bool open_stdin, size_t buffer_size) noexcept :
                  closed(true), read_stdout(read_stdout), read_stderr(read_stderr), open_stdin(open_stdin), buffer_size(buffer_size) {
   open(function);
   async_read();
 }
 
-Process::id_type Process::open(std::function<void()> function) {
+Process::id_type Process::open(std::function<void()> function) noexcept {
   if(open_stdin)
     stdin_fd=std::unique_ptr<fd_type>(new fd_type);
   if(read_stdout)
@@ -83,7 +83,7 @@ Process::id_type Process::open(std::function<void()> function) {
   return pid;
 }
 
-Process::id_type Process::open(const std::string &command, const std::string &path) {
+Process::id_type Process::open(const std::string &command, const std::string &path) noexcept {
   return open([&command, &path] {
     if(!path.empty()) {
       auto path_escaped=path;
@@ -100,7 +100,7 @@ Process::id_type Process::open(const std::string &command, const std::string &pa
   });
 }
 
-void Process::async_read() {
+void Process::async_read() noexcept {
   if(data.id<=0)
     return;
   if(stdout_fd) {
@@ -121,7 +121,7 @@ void Process::async_read() {
   }
 }
 
-int Process::get_exit_status() {
+int Process::get_exit_status() noexcept {
   if(data.id<=0)
     return -1;
   int exit_status;
@@ -137,7 +137,7 @@ int Process::get_exit_status() {
   return exit_status;
 }
 
-void Process::close_fds() {
+void Process::close_fds() noexcept {
   if(stdout_thread.joinable())
     stdout_thread.join();
   if(stderr_thread.joinable())
@@ -173,7 +173,7 @@ bool Process::write(const char *bytes, size_t n) {
   return false;
 }
 
-void Process::close_stdin() {
+void Process::close_stdin() noexcept {
   std::lock_guard<std::mutex> lock(stdin_mutex);
   if(stdin_fd) {
     if(data.id>0)
@@ -182,7 +182,7 @@ void Process::close_stdin() {
   }
 }
 
-void Process::kill(bool force) {
+void Process::kill(bool force) noexcept {
   std::lock_guard<std::mutex> lock(close_mutex);
   if(data.id>0 && !closed) {
     if(force)
@@ -192,7 +192,7 @@ void Process::kill(bool force) {
   }
 }
 
-void Process::kill(id_type id, bool force) {
+void Process::kill(id_type id, bool force) noexcept {
   if(id<=0)
     return;
   if(force)
