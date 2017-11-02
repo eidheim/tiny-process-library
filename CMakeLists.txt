@@ -25,13 +25,19 @@ endif()
 add_library(tiny-process-library ${process_source_files})
 
 target_link_libraries(tiny-process-library ${CMAKE_THREAD_LIBS_INIT})
+target_include_directories(tiny-process-library PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(examples examples.cpp)
-target_link_libraries(examples tiny-process-library)
+option(TPL_BUILD_EXAMPLES OFF)
+
+# To enable examples: cmake -DTPL_BUILD_EXAMPLES=ON ..
+if (TPL_BUILD_EXAMPLES)
+  add_executable(tiny-examples examples.cpp)
+  target_link_libraries(tiny-examples tiny-process-library)
+endif()
 
 option(BUILD_TESTING Off)
 
-# To enable tests: cmake -DBUILD_TESTING=1 ..
+# To enable tests: cmake -DBUILD_TESTING=ON ..
 if(BUILD_TESTING)
   enable_testing()
   add_subdirectory(tests)

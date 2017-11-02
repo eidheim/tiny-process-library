@@ -11,7 +11,7 @@ Process::Data::Data() noexcept : id(0), handle(NULL) {}
 // Simple HANDLE wrapper to close it automatically from the destructor.
 class Handle {
 public:
-  Handle() : handle(INVALID_HANDLE_VALUE) noexcept { }
+  Handle() noexcept : handle(INVALID_HANDLE_VALUE) { }
   ~Handle() noexcept {
     close();
   }
