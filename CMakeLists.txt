@@ -33,13 +33,14 @@ option(BUILD_TESTING OFF)
 if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
   add_executable(examples examples.cpp)
   target_link_libraries(examples tiny-process-library)
+  
   set(BUILD_TESTING ON)
+  
+  install(TARGETS tiny-process-library DESTINATION lib)
+  install(FILES process.hpp DESTINATION include)
 endif()
 
 if(BUILD_TESTING)
   enable_testing()
   add_subdirectory(tests)
 endif()
-
-install(TARGETS tiny-process-library DESTINATION lib)
-install(FILES process.hpp DESTINATION include)
