@@ -18,7 +18,7 @@ class Process {
 public:
 #ifdef _WIN32
   typedef unsigned long id_type; //Process id type
-  typedef void *fd_type; //File descriptor type
+  typedef void *fd_type;         //File descriptor type
 #ifdef UNICODE
   typedef std::wstring string_type;
 #else
@@ -32,7 +32,7 @@ public:
 private:
   class Data {
   public:
-    Data() noexcept ;
+    Data() noexcept;
     id_type id;
 #ifdef _WIN32
     void *handle;
