@@ -216,7 +216,7 @@ void Process::close_stdin() noexcept {
 }
 
 //Based on http://stackoverflow.com/a/1173396
-void Process::kill(bool force) noexcept {
+void Process::kill(bool /*force*/) noexcept {
   std::lock_guard<std::mutex> lock(close_mutex);
   if(data.id>0 && !closed) {
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -242,7 +242,7 @@ void Process::kill(bool force) noexcept {
 }
 
 //Based on http://stackoverflow.com/a/1173396
-void Process::kill(id_type id, bool force) noexcept {
+void Process::kill(id_type id, bool /*force*/) noexcept {
   if(id==0)
     return;
   HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
