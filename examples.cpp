@@ -107,13 +107,13 @@ int main() {
   
   Process process8("sleep 5");
   int exit_status_p8;
-  cout << "Example 8 running: " << (process8.try_get_exit_status(exit_status_p8) ? "yes" : "no") << endl;
+  cout << "Example 8 process running: " << (process8.try_get_exit_status(exit_status_p8) ? "no" : "yes") << endl;
   this_thread::sleep_for(chrono::seconds(2));
-  cout << "Example 8 running: " << (process8.try_get_exit_status(exit_status_p8) ? "yes" : "no") << endl;
+  cout << "Example 8 process running: " << (process8.try_get_exit_status(exit_status_p8) ? "no" : "yes") << endl;
   this_thread::sleep_for(chrono::seconds(2));
-  cout << "Example 8 running: " << (process8.try_get_exit_status(exit_status_p8) ? "yes" : "no") << endl;
+  cout << "Example 8 process running: " << (process8.try_get_exit_status(exit_status_p8) ? "no" : "yes") << endl;
   this_thread::sleep_for(chrono::seconds(2));
-  cout << "Example 8 running: " << (process8.try_get_exit_status(exit_status_p8) ? "yes" : "no") << endl;
+  cout << "Example 8 process running: " << (process8.try_get_exit_status(exit_status_p8) ? "no" : "yes") << endl;
   cout << "Example 8 process returned: " << exit_status_p8 << " (" << (exit_status_p8==0?"success":"failure") << ")" << endl;
 
 #else
@@ -168,13 +168,13 @@ int main() {
 
   Process process5("timeout 5");
   int exit_status_p5;
-  cout << "Example 5 running: " << (process5.try_get_exit_status(exit_status_p5)? "yes" : "no") << endl;
+  cout << "Example 5 running: " << (process5.try_get_exit_status(exit_status_p5)? "no" : "yes") << endl;
   this_thread::sleep_for(chrono::seconds(2));
-  cout << "Example 5 running: " << (process5.try_get_exit_status(exit_status_p5)? "yes" : "no") << endl;
+  cout << "Example 5 running: " << (process5.try_get_exit_status(exit_status_p5)? "no" : "yes") << endl;
   this_thread::sleep_for(chrono::seconds(2));
-  cout << "Example 5 running: " << (process5.try_get_exit_status(exit_status_p5)? "yes" : "no") << endl;
+  cout << "Example 5 running: " << (process5.try_get_exit_status(exit_status_p5)? "no" : "yes") << endl;
   this_thread::sleep_for(chrono::seconds(2));
-  cout << "Example 5 running: " << (process5.try_get_exit_status(exit_status_p5)? "yes" : "no") << endl;
+  cout << "Example 5 running: " << (process5.try_get_exit_status(exit_status_p5)? "no" : "yes") << endl;
   cout << "Example 5 process returned: " << exit_status_p5 << " (" << (exit_status_p5==0?"success":"failure") << ")" << endl;
 
 
