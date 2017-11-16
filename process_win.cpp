@@ -171,7 +171,7 @@ int Process::get_exit_status() noexcept {
   return static_cast<int>(exit_status);
 }
 
-bool Process::try_get_exit_status(int *exit_status) noexcept {
+bool Process::try_get_exit_status(int &exit_status) noexcept {
   if(data.id==0)
     return false;
 
@@ -190,7 +190,7 @@ bool Process::try_get_exit_status(int *exit_status) noexcept {
   }
   close_fds();
 
-  *exit_status = static_cast<int>(exit_status_win);
+  exit_status = static_cast<int>(exit_status_win);
   return true;
 }
 
