@@ -171,7 +171,7 @@ int Process::get_exit_status() noexcept {
   return static_cast<int>(exit_status);
 }
 
-bool Process::try_get_exit_status(int* exit_status) noexcept {
+bool Process::try_get_exit_status(int *exit_status) noexcept {
   if(data.id==0)
     return false;
 

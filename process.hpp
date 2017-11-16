@@ -62,7 +62,7 @@ public:
   ///Wait until process is finished, and return exit status.
   int get_exit_status() noexcept;
   ///Check if the process has finished, return true and set the exit status otherwise return false
-  bool try_get_exit_status(int* exit_status) noexcept;
+  bool try_get_exit_status(int *exit_status) noexcept;
   ///Write to stdin.
   bool write(const char *bytes, size_t n);
   ///Write to stdin. Convenience function using write(const char *, size_t).

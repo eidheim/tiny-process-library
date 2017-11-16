@@ -137,7 +137,7 @@ int Process::get_exit_status() noexcept {
   return exit_status;
 }
 
-bool Process::try_get_exit_status(int* exit_status) noexcept {
+bool Process::try_get_exit_status(int *exit_status) noexcept {
   if(data.id<=0)
     return false;
   id_type p = waitpid(data.id, exit_status, WNOHANG);
