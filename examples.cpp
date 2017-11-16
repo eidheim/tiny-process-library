@@ -103,6 +103,18 @@ int main() {
   cout << "Example 7 process returned: " << exit_status << " (" << (exit_status==0?"success":"failure") << ")" << endl;
   this_thread::sleep_for(chrono::seconds(5));
 
+  cout << endl << "Example 8 - async try get exit status" << endl;
+  
+  Process process8("sleep 5");
+  int exit_status_p8;
+  cout << "Example 8 running: " << (process8.try_get_exit_status(&exit_status_p8) ? "yes" : "no") << endl;
+  this_thread::sleep_for(chrono::seconds(2));
+  cout << "Example 8 running: " << (process8.try_get_exit_status(&exit_status_p8) ? "yes" : "no") << endl;
+  this_thread::sleep_for(chrono::seconds(2));
+  cout << "Example 8 running: " << (process8.try_get_exit_status(&exit_status_p8) ? "yes" : "no") << endl;
+  this_thread::sleep_for(chrono::seconds(2));
+  cout << "Example 8 running: " << (process8.try_get_exit_status(&exit_status_p8) ? "yes" : "no") << endl;
+  cout << "Example 8 process returned: " << exit_status_p8 << " (" << (exit_status_p8==0?"success":"failure") << ")" << endl;
 
 #else
   //Examples for Windows without MSYS2
@@ -151,6 +163,19 @@ int main() {
   this_thread::sleep_for(chrono::seconds(5));
   process4->kill();
   this_thread::sleep_for(chrono::seconds(5));
+
+  cout << endl << "Example 5 - async try get exit status" << endl;
+
+  Process process5("timeout 5");
+  int exit_status_p5;
+  cout << "Example 5 running: " << (process5.try_get_exit_status(&exit_status_p5)? "yes" : "no") << endl;
+  this_thread::sleep_for(chrono::seconds(2));
+  cout << "Example 5 running: " << (process5.try_get_exit_status(&exit_status_p5)? "yes" : "no") << endl;
+  this_thread::sleep_for(chrono::seconds(2));
+  cout << "Example 5 running: " << (process5.try_get_exit_status(&exit_status_p5)? "yes" : "no") << endl;
+  this_thread::sleep_for(chrono::seconds(2));
+  cout << "Example 5 running: " << (process5.try_get_exit_status(&exit_status_p5)? "yes" : "no") << endl;
+  cout << "Example 5 process returned: " << exit_status_p5 << " (" << (exit_status_p5==0?"success":"failure") << ")" << endl;
 
 
 #endif

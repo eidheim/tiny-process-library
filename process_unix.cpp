@@ -137,6 +137,22 @@ int Process::get_exit_status() noexcept {
   return exit_status;
 }
 
+bool Process::try_get_exit_status(int* exit_status) noexcept {
+  if(data.id<=0)
+    return false;
+  id_type p = waitpid(data.id, exit_status, WNOHANG);
+  if (p == data.id) {
+    {
+        std::lock_guard<std::mutex> lock(close_mutex);
+        closed=true;
+    }
+    close_fds();
+    if(*exit_status>=256)
+        *exit_status=*exit_status>>8;
+  }
+  return p == 0;
+}
+
 void Process::close_fds() noexcept {
   if(stdout_thread.joinable())
     stdout_thread.join();
