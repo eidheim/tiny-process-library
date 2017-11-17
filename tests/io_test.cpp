@@ -65,4 +65,17 @@ int main() {
     assert(output->substr(0, 4)=="Test");
     output->clear();
   }
+  
+  {
+    Process process("sleep 5");
+    int exit_status=-2;
+    assert(!process.try_get_exit_status(exit_status));
+    assert(exit_status==-2);
+    this_thread::sleep_for(chrono::seconds(3));
+    assert(!process.try_get_exit_status(exit_status));
+    assert(exit_status==-2);
+    this_thread::sleep_for(chrono::seconds(5));
+    assert(process.try_get_exit_status(exit_status));
+    assert(exit_status==0);
+  }
 }
