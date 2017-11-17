@@ -103,6 +103,7 @@ Process::id_type Process::open(const std::string &command, const std::string &pa
 void Process::async_read() noexcept {
   if(data.id<=0)
     return;
+
   if(stdout_fd) {
     stdout_thread=std::thread([this](){
       auto buffer = std::unique_ptr<char[]>( new char[buffer_size] );
@@ -124,6 +125,7 @@ void Process::async_read() noexcept {
 int Process::get_exit_status() noexcept {
   if(data.id<=0)
     return -1;
+
   int exit_status;
   waitpid(data.id, &exit_status, 0);
   {
@@ -140,8 +142,8 @@ int Process::get_exit_status() noexcept {
 bool Process::try_get_exit_status(int &exit_status) noexcept {
   if(data.id<=0)
     return false;
-  id_type p = waitpid(data.id, &exit_status, WNOHANG);
 
+  id_type p = waitpid(data.id, &exit_status, WNOHANG);
   if (p == 0)
     return false;
 
@@ -150,6 +152,7 @@ bool Process::try_get_exit_status(int &exit_status) noexcept {
     closed=true;
   }
   close_fds();
+
   if(exit_status>=256)
     exit_status=exit_status>>8;
 
@@ -214,6 +217,7 @@ void Process::kill(bool force) noexcept {
 void Process::kill(id_type id, bool force) noexcept {
   if(id<=0)
     return;
+
   if(force)
     ::kill(-id, SIGTERM);
   else

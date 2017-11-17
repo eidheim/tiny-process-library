@@ -61,7 +61,8 @@ public:
   id_type get_id() const noexcept;
   ///Wait until process is finished, and return exit status.
   int get_exit_status() noexcept;
-  ///Check if the process has finished, return true and set the exit status otherwise return false
+  ///If process is finished, returns true and sets the exit status. Returns false otherwise.
+  ///TODO: not yet tested on Windows
   bool try_get_exit_status(int &exit_status) noexcept;
   ///Write to stdin.
   bool write(const char *bytes, size_t n);
