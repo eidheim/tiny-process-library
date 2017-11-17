@@ -106,14 +106,12 @@ int main() {
 
   cout << endl << "Example 8 - demonstrates Process::try_get_exit_status" << endl;
   Process process8("sleep 5");
-  cout << "Example 8 process running: " << (process8.try_get_exit_status(exit_status) ? "no" : "yes") << endl;
-  this_thread::sleep_for(chrono::seconds(2));
-  cout << "Example 8 process running: " << (process8.try_get_exit_status(exit_status) ? "no" : "yes") << endl;
-  this_thread::sleep_for(chrono::seconds(2));
-  cout << "Example 8 process running: " << (process8.try_get_exit_status(exit_status) ? "no" : "yes") << endl;
-  this_thread::sleep_for(chrono::seconds(2));
-  cout << "Example 8 process running: " << (process8.try_get_exit_status(exit_status) ? "no" : "yes") << endl;
+  while(!process8.try_get_exit_status(exit_status)) {
+    cout << "Example 8 process is running" << endl;
+    this_thread::sleep_for(chrono::seconds(2));
+  }
   cout << "Example 8 process returned: " << exit_status << " (" << (exit_status==0?"success":"failure") << ")" << endl;
+
 
 #else
   //Examples for Windows without MSYS2
@@ -166,13 +164,10 @@ int main() {
   
   cout << endl << "Example 5 - demonstrates Process::try_get_exit_status" << endl;
   Process process5("timeout 5");
-  cout << "Example 5 running: " << (process5.try_get_exit_status(exit_status)? "no" : "yes") << endl;
-  this_thread::sleep_for(chrono::seconds(2));
-  cout << "Example 5 running: " << (process5.try_get_exit_status(exit_status)? "no" : "yes") << endl;
-  this_thread::sleep_for(chrono::seconds(2));
-  cout << "Example 5 running: " << (process5.try_get_exit_status(exit_status)? "no" : "yes") << endl;
-  this_thread::sleep_for(chrono::seconds(2));
-  cout << "Example 5 running: " << (process5.try_get_exit_status(exit_status)? "no" : "yes") << endl;
+  while(!process5.try_get_exit_status(exit_status)) {
+    cout << "Example 5 process is running" << endl;
+    this_thread::sleep_for(chrono::seconds(2));
+  }
   cout << "Example 5 process returned: " << exit_status << " (" << (exit_status==0?"success":"failure") << ")" << endl;
 
 
