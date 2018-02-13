@@ -106,14 +106,10 @@ Process::id_type Process::open(const string_type &command, const string_type &pa
   BOOL bSuccess = CreateProcess(nullptr, process_command.empty()?nullptr:&process_command[0], nullptr, nullptr, TRUE, 0,
                                 nullptr, path.empty()?nullptr:path.c_str(), &startup_info, &process_info);
 
-  if(!bSuccess) {
-    CloseHandle(process_info.hProcess);
-    CloseHandle(process_info.hThread);
+  if(!bSuccess)
     return 0;
-  }
-  else {
+  else
     CloseHandle(process_info.hThread);
-  }
 
   if(stdin_fd) *stdin_fd=stdin_wr_p.detach();
   if(stdout_fd) *stdout_fd=stdout_rd_p.detach();
