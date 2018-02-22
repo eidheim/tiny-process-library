@@ -12,7 +12,7 @@ Process::Process(std::function<void()> function,
                  std::function<void (const char *, size_t)> read_stdout,
                  std::function<void (const char *, size_t)> read_stderr,
                  bool open_stdin, size_t buffer_size) noexcept :
-                 closed(true), read_stdout(read_stdout), read_stderr(read_stderr), open_stdin(open_stdin), buffer_size(buffer_size) {
+                 closed(true), read_stdout(std::move(read_stdout)), read_stderr(std::move(read_stderr)), open_stdin(open_stdin), buffer_size(buffer_size) {
   open(function);
   async_read();
 }
