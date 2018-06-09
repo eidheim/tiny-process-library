@@ -1,7 +1,9 @@
-# tiny-process-library [![Build Status](https://travis-ci.org/eidheim/tiny-process-library.svg?branch=master)](https://travis-ci.org/eidheim/tiny-process-library)
+**_This project has moved to https://gitlab.com/eidheim/tiny-process-library._**
+
+# tiny-process-library
 A small platform independent library making it simple to create and stop new processes in C++, as well as writing to stdin and reading from stdout and stderr of a new process.
 
-This library was created for, and is used by the C++ IDE project [juCi++](https://github.com/cppit/jucipp).
+This library was created for, and is used by the C++ IDE project [juCi++](https://gitlab.com/cppit/jucipp).
 
 ### Features
 * No external dependencies
@@ -15,13 +17,13 @@ This library was created for, and is used by the C++ IDE project [juCi++](https:
 * Correctly closes file descriptors/handles
 
 ### Usage
-See [examples.cpp](https://github.com/eidheim/tiny-process-library/blob/master/examples.cpp).
+See [examples.cpp](https://gitlab.com/eidheim/tiny-process-library/blob/master/examples.cpp).
 
 ### Get, compile and run
 
 #### Unix-like systems
 ```sh
-git clone http://github.com/eidheim/tiny-process-library
+git clone http://gitlab.com/eidheim/tiny-process-library
 cd tiny-process-library
 mkdir build
 cd build
@@ -32,7 +34,7 @@ make
 
 #### Windows with MSYS2 (https://msys2.github.io/)
 ```sh
-git clone http://github.com/eidheim/tiny-process-library
+git clone http://gitlab.com/eidheim/tiny-process-library
 cd tiny-process-library
 mkdir build
 cd build
